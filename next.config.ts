@@ -1,7 +1,12 @@
-import type { NextConfig } from "next";
+import { config } from 'dotenv';
+config({ path: '.env.local' });
 
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  env: {
+    TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
+    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
+  },
 };
 
 export default nextConfig;

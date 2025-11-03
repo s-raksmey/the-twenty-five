@@ -3,6 +3,10 @@
 
 import { signOut } from 'next-auth/react';
 
+// components/SignOutButton.tsx
+
+// components/SignOutButton.tsx
+
 export default function SignOutButton() {
   return (
     <button

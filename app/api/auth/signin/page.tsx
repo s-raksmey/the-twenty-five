@@ -1,14 +1,19 @@
 // app/auth/signin/page.tsx
-"use client";
+'use client';
 
-import { signIn } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Shield } from "lucide-react";
+import { Shield } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+
+// app/auth/signin/page.tsx
+
+// app/auth/signin/page.tsx
 
 export default function SignInPage() {
   const handleSignIn = () => {
-    signIn("google", { callbackUrl: "/" });
+    signIn('google', { callbackUrl: '/' });
   };
 
   return (
@@ -28,7 +33,8 @@ export default function SignInPage() {
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              We verify all accounts to ensure security. Temporary or fake emails will be rejected.
+              We verify all accounts to ensure security. Temporary or fake
+              emails will be rejected.
             </AlertDescription>
           </Alert>
 

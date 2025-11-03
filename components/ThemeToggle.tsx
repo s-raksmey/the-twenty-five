@@ -1,11 +1,22 @@
 // components/ThemeToggle.tsx
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { motion } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Moon, Sun } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+// components/ThemeToggle.tsx
+
+// components/ThemeToggle.tsx
 
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
@@ -13,9 +24,11 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const systemDark = window.matchMedia(
+      '(prefers-color-scheme: dark)'
+    ).matches;
     const initialDark = savedTheme ? savedTheme === 'dark' : systemDark;
-    
+
     const frame = requestAnimationFrame(() => {
       setIsDark(initialDark);
       setMounted(true);
@@ -26,7 +39,7 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     if (isDark) {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
@@ -67,7 +80,9 @@ export default function ThemeToggle() {
               size="icon"
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-lg backdrop-blur-sm bg-background/80 border"
               onClick={toggleTheme}
-              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-label={
+                isDark ? 'Switch to light mode' : 'Switch to dark mode'
+              }
             >
               {isDark ? (
                 <Sun className="w-4 h-4 sm:w-5 sm:h-5" />

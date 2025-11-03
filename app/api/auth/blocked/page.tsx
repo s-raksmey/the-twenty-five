@@ -1,8 +1,10 @@
 // app/auth/blocked/page.tsx
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ShieldOff } from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Link from 'next/link';
+
+import { ShieldOff } from 'lucide-react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 export default function BlockedPage() {
   return (
@@ -11,32 +13,31 @@ export default function BlockedPage() {
         <div className="mx-auto w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mb-4">
           <ShieldOff className="w-8 h-8 text-destructive" />
         </div>
-        
+
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-destructive">Access Blocked</h1>
-          
+          <h1 className="text-2xl font-bold text-destructive">
+            Access Blocked
+          </h1>
+
           <Alert variant="destructive">
             <AlertDescription>
-              Your account has been blocked from accessing this resource. 
-              This may be due to suspicious activity or policy violations.
+              Your account has been blocked from accessing this resource. This
+              may be due to suspicious activity or policy violations.
             </AlertDescription>
           </Alert>
 
           <p className="text-sm text-muted-foreground">
-            If you believe this is an error, please contact support with your account details.
+            If you believe this is an error, please contact support with your
+            account details.
           </p>
 
           <div className="space-y-3">
             <Button asChild className="w-full">
-              <Link href="/auth/signin">
-                Try Different Account
-              </Link>
+              <Link href="/auth/signin">Try Different Account</Link>
             </Button>
-            
+
             <Button variant="outline" asChild className="w-full">
-              <Link href="/">
-                Return to Home
-              </Link>
+              <Link href="/">Return to Home</Link>
             </Button>
           </div>
         </div>

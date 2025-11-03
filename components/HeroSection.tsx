@@ -2,8 +2,13 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+
+// components/HeroSection.tsx
+
+// components/HeroSection.tsx
 
 export default function HeroSection() {
   return (
@@ -39,10 +44,10 @@ export default function HeroSection() {
             transition={{ delay: 0.3 }}
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-tight sm:leading-none"
           >
-            Build{" "}
+            Build{' '}
             <span className="gradient-text bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent block sm:inline">
               Amazing
-            </span>{" "}
+            </span>{' '}
             Things
           </motion.h1>
 
@@ -53,7 +58,8 @@ export default function HeroSection() {
             transition={{ delay: 0.4 }}
             className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4 sm:px-0"
           >
-            The modern platform that transforms your ideas into reality. Fast, secure, and beautifully designed for the future.
+            The modern platform that transforms your ideas into reality. Fast,
+            secure, and beautifully designed for the future.
           </motion.p>
 
           {/* CTA Buttons */}
@@ -63,10 +69,17 @@ export default function HeroSection() {
             transition={{ delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-6 sm:pt-8 px-4 sm:px-0"
           >
-            <Button size="lg" className="gap-2 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto">
+            <Button
+              size="lg"
+              className="gap-2 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto"
+            >
               Get Started Free <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
-            <Button size="lg" variant="outline" className="gap-2 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto">
+            <Button
+              size="lg"
+              variant="outline"
+              className="gap-2 text-base sm:text-lg px-6 sm:px-8 py-5 sm:py-6 w-full sm:w-auto"
+            >
               <Play className="w-4 h-4 sm:w-5 sm:h-5" />
               Watch Demo
             </Button>
@@ -80,9 +93,9 @@ export default function HeroSection() {
             className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 sm:pt-16 max-w-2xl mx-auto px-4 sm:px-0"
           >
             {[
-              { number: "10K+", label: "Active Users" },
-              { number: "99.9%", label: "Uptime" },
-              { number: "24/7", label: "Support" }
+              { number: '10K+', label: 'Active Users' },
+              { number: '99.9%', label: 'Uptime' },
+              { number: '24/7', label: 'Support' },
             ].map((stat, index) => (
               <div key={index} className="text-center">
                 <div className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">

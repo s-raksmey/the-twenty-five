@@ -1,20 +1,20 @@
 // lib/auth-adapter.ts
-import { db } from "@/app/db";
-import { users, accounts, sessions, verificationTokens } from "@/app/db/schema";
-import { Adapter } from "next-auth/adapters";
-import { and, eq } from "drizzle-orm";
+import { db } from '@/app/db';
+import { accounts, sessions, users, verificationTokens } from '@/app/db/schema';
+import { and, eq } from 'drizzle-orm';
+import { Adapter } from 'next-auth/adapters';
 import type {
-  AdapterUser,
-  AdapterSession,
   AdapterAccount,
+  AdapterSession,
+  AdapterUser,
   VerificationToken,
-} from "next-auth/adapters";
+} from 'next-auth/adapters';
 
 const uuid = () => crypto.randomUUID();
 
 export const TursoDrizzleAdapter: Adapter = {
   // CREATE USER
-  async createUser(profile: Omit<AdapterUser, "id">): Promise<AdapterUser> {
+  async createUser(profile: Omit<AdapterUser, 'id'>): Promise<AdapterUser> {
     const id = uuid();
 
     const [row] = await db
@@ -30,10 +30,14 @@ export const TursoDrizzleAdapter: Adapter = {
       })
       .returning();
 
+    if (!row) {
+      throw new Error('Failed to create user');
+    }
+
     return {
       id: row.id,
       name: row.name,
-      email: row.email ?? "", // string | null
+      email: row.email ?? '',
       emailVerified: row.emailVerified,
       image: row.image,
     };
@@ -41,20 +45,15 @@ export const TursoDrizzleAdapter: Adapter = {
 
   // GET USER BY ID
   async getUser(id: string): Promise<AdapterUser | null> {
-    const row = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, id))
-      .limit(1)
-      .then((rows: typeof users.$inferSelect[]) => rows[0] ?? null)
-      .catch(() => null);
+    const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
     return {
       id: row.id,
       name: row.name,
-      email: row.email ?? "",
+      email: row.email ?? '',
       emailVerified: row.emailVerified,
       image: row.image,
     };
@@ -62,20 +61,19 @@ export const TursoDrizzleAdapter: Adapter = {
 
   // GET USER BY EMAIL
   async getUserByEmail(email: string): Promise<AdapterUser | null> {
-    const row = await db
+    const rows = await db
       .select()
       .from(users)
       .where(eq(users.email, email))
-      .limit(1)
-      .then((rows: typeof users.$inferSelect[]) => rows[0] ?? null)
-      .catch(() => null);
+      .limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
     return {
       id: row.id,
       name: row.name,
-      email: row.email ?? "",
+      email: row.email ?? '',
       emailVerified: row.emailVerified,
       image: row.image,
     };
@@ -85,8 +83,11 @@ export const TursoDrizzleAdapter: Adapter = {
   async getUserByAccount({
     provider,
     providerAccountId,
-  }: Pick<AdapterAccount, "provider" | "providerAccountId">): Promise<AdapterUser | null> {
-    const row = await db
+  }: Pick<
+    AdapterAccount,
+    'provider' | 'providerAccountId'
+  >): Promise<AdapterUser | null> {
+    const rows = await db
       .select({ user: users })
       .from(accounts)
       .innerJoin(users, eq(accounts.userId, users.id))
@@ -96,18 +97,15 @@ export const TursoDrizzleAdapter: Adapter = {
           eq(accounts.providerAccountId, providerAccountId)
         )
       )
-      .limit(1)
-      .then(
-        (rows: { user: typeof users.$inferSelect }[]) => rows[0] ?? null
-      )
-      .catch(() => null);
+      .limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
     return {
       id: row.user.id,
       name: row.user.name,
-      email: row.user.email ?? "",
+      email: row.user.email ?? '',
       emailVerified: row.user.emailVerified,
       image: row.user.image,
     };
@@ -149,6 +147,10 @@ export const TursoDrizzleAdapter: Adapter = {
       })
       .returning();
 
+    if (!row) {
+      throw new Error('Failed to create session');
+    }
+
     return {
       sessionToken: row.sessionToken,
       userId: row.userId,
@@ -160,7 +162,7 @@ export const TursoDrizzleAdapter: Adapter = {
   async getSessionAndUser(
     sessionToken: string
   ): Promise<{ session: AdapterSession; user: AdapterUser } | null> {
-    const row = await db
+    const rows = await db
       .select({
         session: sessions,
         user: users,
@@ -168,15 +170,9 @@ export const TursoDrizzleAdapter: Adapter = {
       .from(sessions)
       .innerJoin(users, eq(sessions.userId, users.id))
       .where(eq(sessions.sessionToken, sessionToken))
-      .limit(1)
-      .then(
-        (rows: {
-          session: typeof sessions.$inferSelect;
-          user: typeof users.$inferSelect;
-        }[]) => rows[0] ?? null
-      )
-      .catch(() => null);
+      .limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
     return {
@@ -188,7 +184,7 @@ export const TursoDrizzleAdapter: Adapter = {
       user: {
         id: row.user.id,
         name: row.user.name,
-        email: row.user.email ?? "",
+        email: row.user.email ?? '',
         emailVerified: row.user.emailVerified,
         image: row.user.image,
       },
@@ -197,7 +193,7 @@ export const TursoDrizzleAdapter: Adapter = {
 
   // UPDATE SESSION
   async updateSession(
-    session: Partial<AdapterSession> & Pick<AdapterSession, "sessionToken">
+    session: Partial<AdapterSession> & Pick<AdapterSession, 'sessionToken'>
   ): Promise<AdapterSession | null> {
     const expires = session.expires ? new Date(session.expires) : undefined;
 
@@ -206,13 +202,13 @@ export const TursoDrizzleAdapter: Adapter = {
       .set({ expires })
       .where(eq(sessions.sessionToken, session.sessionToken));
 
-    const row = await db
+    const rows = await db
       .select()
       .from(sessions)
       .where(eq(sessions.sessionToken, session.sessionToken))
-      .limit(1)
-      .then((rows: typeof sessions.$inferSelect[]) => rows[0] ?? null);
+      .limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
     return {
@@ -246,7 +242,7 @@ export const TursoDrizzleAdapter: Adapter = {
     identifier: string;
     token: string;
   }): Promise<VerificationToken | null> {
-    const row = await db
+    const rows = await db
       .select()
       .from(verificationTokens)
       .where(
@@ -255,13 +251,14 @@ export const TursoDrizzleAdapter: Adapter = {
           eq(verificationTokens.token, token)
         )
       )
-      .limit(1)
-      .then((rows: typeof verificationTokens.$inferSelect[]) => rows[0] ?? null)
-      .catch(() => null);
+      .limit(1);
 
+    const row = rows[0];
     if (!row) return null;
 
-    await db.delete(verificationTokens).where(eq(verificationTokens.token, token));
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.token, token));
 
     return {
       identifier: row.identifier,

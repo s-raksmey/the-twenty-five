@@ -1,22 +1,28 @@
 // app/layout.tsx
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
 import { Providers } from "./providers";
-// or Navbar if you prefer the client-side version
+import Navbar from "@/components/Navbar";
+import ThemeToggle from "@/components/ThemeToggle";
+import Footer from "@/components/Footer";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My App",
+  title: "T-VX",
   description: "NextAuth + Drizzle + Turso",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen bg-gray-50">
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} min-h-screen`}>
         <Providers>
-          <Header />
-          <main>{children}</main>
+          <Navbar />
+          <main className="container mx-auto px-4 py-8">{children}</main>
+          <Footer />
+          <ThemeToggle />
         </Providers>
       </body>
     </html>

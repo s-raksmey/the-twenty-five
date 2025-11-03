@@ -1,6 +1,5 @@
-// middleware.ts
+// middleware.ts (or proxy.ts)
 import { NextResponse } from 'next/server';
-
 import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
@@ -14,11 +13,25 @@ export default withAuth(
       return NextResponse.redirect(new URL('/auth/blocked', request.url));
     }
 
-    // Add security headers
+    // Add security headers with proper CSP for external images
     const response = NextResponse.next();
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    
+    // Fix: Allow images from Google and other trusted sources
+    response.headers.set(
+      'Content-Security-Policy',
+      [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https: blob:",
+        "font-src 'self'",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+      ].join('; ')
+    );
 
     return response;
   },

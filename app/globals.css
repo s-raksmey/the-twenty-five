@@ -54,15 +54,20 @@
   * {
     border-color: hsl(var(--border));
   }
-  
+
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Smooth transitions for theme switching */
   * {
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.2s ease;
   }
 }
 
@@ -70,15 +75,15 @@
   .gradient-text {
     @apply bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent;
   }
-  
+
   .gradient-bg {
     @apply bg-gradient-to-br from-background via-background to-primary/5;
   }
-  
+
   .glass {
     @apply bg-background/80 backdrop-blur-md border border-border/50;
   }
-  
+
   .text-balance {
     text-wrap: balance;
   }
@@ -108,39 +113,39 @@
   .animate-in {
     animation: animate-in 0.5s ease-out;
   }
-  
+
   .animate-in-up {
     animation: animate-in-up 0.5s ease-out;
   }
-  
+
   .animate-in-down {
     animation: animate-in-down 0.5s ease-out;
   }
-  
+
   .animate-in-left {
     animation: animate-in-left 0.5s ease-out;
   }
-  
+
   .animate-in-right {
     animation: animate-in-right 0.5s ease-out;
   }
-  
+
   .fade-in {
     animation: fade-in 0.5s ease-out;
   }
-  
+
   .slide-in-from-top {
     animation: slide-in-from-top 0.5s ease-out;
   }
-  
+
   .slide-in-from-bottom {
     animation: slide-in-from-bottom 0.5s ease-out;
   }
-  
+
   .slide-in-from-left {
     animation: slide-in-from-left 0.5s ease-out;
   }
-  
+
   .slide-in-from-right {
     animation: slide-in-from-right 0.5s ease-out;
   }
@@ -278,7 +283,8 @@
 
 /* Pulse animation for loading states */
 @keyframes pulse-soft {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

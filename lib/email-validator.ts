@@ -2,11 +2,21 @@
 export class EmailValidator {
   // Common disposable email domains
   private static disposableDomains: string[] = [
-    'tempmail.com', 'guerrillamail.com', 'mailinator.com', 
-    '10minutemail.com', 'throwawaymail.com', 'fakeinbox.com',
-    'yopmail.com', 'trashmail.com', 'temp-mail.org',
-    'sharklasers.com', 'guerrillamail.net', 'grr.la',
-    'pokemail.net', 'spam4.me', 'disposableemail.org'
+    'tempmail.com',
+    'guerrillamail.com',
+    'mailinator.com',
+    '10minutemail.com',
+    'throwawaymail.com',
+    'fakeinbox.com',
+    'yopmail.com',
+    'trashmail.com',
+    'temp-mail.org',
+    'sharklasers.com',
+    'guerrillamail.net',
+    'grr.la',
+    'pokemail.net',
+    'spam4.me',
+    'disposableemail.org',
   ];
 
   // Suspicious patterns
@@ -17,7 +27,7 @@ export class EmailValidator {
     /^temp\d*@/i,
     /^spam\d*@/i,
     /^admin\d*@/i,
-    /^user\d*@/i
+    /^user\d*@/i,
   ];
 
   static isDisposableEmail(email: string): boolean {

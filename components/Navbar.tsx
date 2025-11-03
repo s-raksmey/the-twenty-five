@@ -1,22 +1,29 @@
 // components/Navbar.tsx (updated session usage)
 'use client';
 
-import { useSession, signIn, signOut } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "@/components/ui/button";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
+
+import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { signIn, signOut, useSession } from 'next-auth/react';
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Skeleton } from '@/components/ui/skeleton';
+
+// components/Navbar.tsx (updated session usage)
+
+// components/Navbar.tsx (updated session usage)
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -32,7 +39,11 @@ export default function Navbar() {
   }, []);
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
   };
 
   const navigation = [
@@ -64,16 +75,18 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 shrink-0">
             <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary" />
-            <span className="text-xl sm:text-2xl font-bold tracking-tight">THE TWENTY FIVE</span>
+            <span className="text-xl sm:text-2xl font-bold tracking-tight">
+              THE TWENTY FIVE
+            </span>
           </Link>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+            {navigation.map(item => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium transition-colors hover:text-primary text-foreground/80 hover:text-foreground"
+                className="text-sm font-medium transition-colors hover:text-primary text-foreground/80"
               >
                 {item.name}
               </Link>
@@ -90,11 +103,19 @@ export default function Navbar() {
             ) : session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
+                      <AvatarImage
+                        src={session.user?.image || ''}
+                        alt={session.user?.name || ''}
+                      />
                       <AvatarFallback className="bg-gradient-to-r from-primary to-secondary text-white text-xs">
-                        {session.user?.name ? getInitials(session.user.name) : 'U'}
+                        {session.user?.name
+                          ? getInitials(session.user.name)
+                          : 'U'}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -102,7 +123,9 @@ export default function Navbar() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{session.user?.name}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {session.user?.name}
+                      </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {session.user?.email}
                       </p>
@@ -116,7 +139,7 @@ export default function Navbar() {
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={handleSignOut}
                     className="text-red-600 focus:text-red-600"
                   >
@@ -125,11 +148,7 @@ export default function Navbar() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                onClick={handleSignIn}
-                className="gap-2"
-                size="sm"
-              >
+              <Button onClick={handleSignIn} className="gap-2" size="sm">
                 <GoogleIcon />
                 <span>Sign in</span>
               </Button>
@@ -143,11 +162,19 @@ export default function Navbar() {
             ) : session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
+                      <AvatarImage
+                        src={session.user?.image || ''}
+                        alt={session.user?.name || ''}
+                      />
                       <AvatarFallback className="bg-gradient-to-r from-primary to-secondary text-white text-xs">
-                        {session.user?.name ? getInitials(session.user.name) : 'U'}
+                        {session.user?.name
+                          ? getInitials(session.user.name)
+                          : 'U'}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -155,7 +182,9 @@ export default function Navbar() {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{session.user?.name}</p>
+                      <p className="text-sm font-medium leading-none">
+                        {session.user?.name}
+                      </p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {session.user?.email}
                       </p>
@@ -169,7 +198,7 @@ export default function Navbar() {
                     <Link href="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={handleSignOut}
                     className="text-red-600 focus:text-red-600"
                   >
@@ -187,14 +216,18 @@ export default function Navbar() {
                 <span className="sr-only">Sign in</span>
               </Button>
             )}
-            
+
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="h-8 w-8"
             >
-              {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              {isMobileMenuOpen ? (
+                <X className="w-4 h-4" />
+              ) : (
+                <Menu className="w-4 h-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -210,7 +243,7 @@ export default function Navbar() {
               className="md:hidden border-t bg-background/95 backdrop-blur"
             >
               <div className="py-4 space-y-2">
-                {navigation.map((item) => (
+                {navigation.map(item => (
                   <Link
                     key={item.name}
                     href={item.href}
@@ -220,7 +253,7 @@ export default function Navbar() {
                     {item.name}
                   </Link>
                 ))}
-                
+
                 {/* Mobile Auth Section */}
                 <div className="px-4 py-3 border-t">
                   {status === 'loading' ? (
@@ -232,24 +265,36 @@ export default function Navbar() {
                     <div className="space-y-3">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
+                          <AvatarImage
+                            src={session.user?.image || ''}
+                            alt={session.user?.name || ''}
+                          />
                           <AvatarFallback className="bg-gradient-to-r from-primary to-secondary text-white text-xs">
-                            {session.user?.name ? getInitials(session.user.name) : 'U'}
+                            {session.user?.name
+                              ? getInitials(session.user.name)
+                              : 'U'}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{session.user?.name}</p>
-                          <p className="text-xs text-muted-foreground truncate">{session.user?.email}</p>
+                          <p className="text-sm font-medium truncate">
+                            {session.user?.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {session.user?.email}
+                          </p>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-2">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href="/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Link
+                            href="/profile"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                          >
                             Profile
                           </Link>
                         </Button>
-                        <Button 
-                          variant="destructive" 
+                        <Button
+                          variant="destructive"
                           size="sm"
                           onClick={() => {
                             handleSignOut();

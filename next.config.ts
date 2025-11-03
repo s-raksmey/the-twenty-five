@@ -1,11 +1,13 @@
-import { config } from 'dotenv';
-config({ path: '.env.local' });
+// next.config.ts
+import type { NextConfig } from 'next';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ['@libsql/client'],
+  },
   env: {
-    TURSO_CONNECTION_URL: process.env.TURSO_CONNECTION_URL,
-    TURSO_AUTH_TOKEN: process.env.TURSO_AUTH_TOKEN,
+    TURSO_CONNECTION_URL: process.env['TURSO_CONNECTION_URL'],
+    TURSO_AUTH_TOKEN: process.env['TURSO_AUTH_TOKEN'],
   },
 };
 

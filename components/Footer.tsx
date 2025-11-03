@@ -2,17 +2,17 @@
 'use client';
 
 import Link from 'next/link';
+
 import { motion } from 'framer-motion';
-import { 
-  Github, 
-  Twitter, 
-  Linkedin, 
-  Mail, 
-  ArrowUp,
-} from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
+import { ArrowUp, Github, Linkedin, Mail, Twitter } from 'lucide-react';
+
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Separator } from '@/components/ui/separator';
+
+// components/Footer.tsx
+
+// components/Footer.tsx
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -95,7 +95,7 @@ export default function Footer() {
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8 sm:mb-12">
           {/* Brand Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -103,16 +103,19 @@ export default function Footer() {
           >
             <Link href="/" className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary" />
-              <span className="text-xl sm:text-2xl font-bold">THE TWENTY FIVE</span>
+              <span className="text-xl sm:text-2xl font-bold">
+                THE TWENTY FIVE
+              </span>
             </Link>
             <p className="text-muted-foreground mb-6 max-w-md text-sm sm:text-base">
-              Building the future of productivity with cutting-edge design and 
-              innovative technology. Join thousands of users transforming their workflow.
+              Building the future of productivity with cutting-edge design and
+              innovative technology. Join thousands of users transforming their
+              workflow.
             </p>
-            
+
             {/* Social Links */}
             <div className="flex space-x-3 sm:space-x-4">
-              {socialLinks.map((social) => (
+              {socialLinks.map(social => (
                 <motion.a
                   key={social.name}
                   href={social.href}
@@ -128,7 +131,7 @@ export default function Footer() {
           </motion.div>
 
           {/* Newsletter Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
@@ -139,31 +142,31 @@ export default function Footer() {
               Get the latest news and product updates delivered to your inbox.
             </p>
             <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-2">
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
+              <Input
+                type="email"
+                placeholder="Enter your email"
                 className="flex-1"
               />
-              <Button className="shrink-0 sm:px-6">
-                Subscribe
-              </Button>
+              <Button className="shrink-0 sm:px-6">Subscribe</Button>
             </div>
           </motion.div>
 
           {/* Quick Links Grid */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className="lg:col-span-4 grid grid-cols-2 gap-6 sm:gap-8"
           >
-            {footerSections.map((section) => (
+            {footerSections.map(section => (
               <div key={section.title}>
-                <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">{section.title}</h4>
+                <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">
+                  {section.title}
+                </h4>
                 <ul className="space-y-2">
-                  {section.links.map((link) => (
+                  {section.links.map(link => (
                     <li key={link.name}>
-                      <Link 
+                      <Link
                         href={link.href}
                         className="text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
                       >
@@ -198,16 +201,25 @@ export default function Footer() {
             transition={{ duration: 0.5, delay: 0.4 }}
             className="flex items-center space-x-4 sm:space-x-6 text-sm text-muted-foreground"
           >
-            <Link href="/privacy" className="hover:text-foreground transition-colors text-xs sm:text-sm">
+            <Link
+              href="/privacy"
+              className="hover:text-foreground transition-colors text-xs sm:text-sm"
+            >
               Privacy
             </Link>
-            <Link href="/terms" className="hover:text-foreground transition-colors text-xs sm:text-sm">
+            <Link
+              href="/terms"
+              className="hover:text-foreground transition-colors text-xs sm:text-sm"
+            >
               Terms
             </Link>
-            <Link href="/cookies" className="hover:text-foreground transition-colors text-xs sm:text-sm">
+            <Link
+              href="/cookies"
+              className="hover:text-foreground transition-colors text-xs sm:text-sm"
+            >
               Cookies
             </Link>
-            
+
             {/* Scroll to Top Button */}
             <motion.button
               whileHover={{ scale: 1.1, y: -2 }}

@@ -1,6 +1,7 @@
 // middleware.ts
-import { withAuth } from "next-auth/middleware";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+
+import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
   function middleware(request) {
@@ -32,12 +33,12 @@ export default withAuth(
           '/auth/signin',
           '/auth/error',
           '/auth/blocked',
-          '/api/auth'
+          '/api/auth',
         ];
 
         // Check if the route is public
-        const isPublicRoute = publicRoutes.some(route => 
-          pathname === route || pathname.startsWith(`${route}/`)
+        const isPublicRoute = publicRoutes.some(
+          route => pathname === route || pathname.startsWith(`${route}/`)
         );
 
         if (isPublicRoute) {

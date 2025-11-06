@@ -56,6 +56,10 @@ module.exports = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      backgroundImage: {
+        'hero-radial':
+          'radial-gradient(ellipse_at_top_left,var(--tw-color-primary)/0.15,transparent_60%)',
+      },
     },
   },
   plugins: [],

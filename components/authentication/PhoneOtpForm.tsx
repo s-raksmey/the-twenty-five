@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Shield, RotateCcw, TimerReset } from 'lucide-react';
+import { ArrowLeft, RotateCcw, Shield, Sparkle, TimerReset } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,6 +13,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 interface PhoneOtpFormProps {
   onBack: () => void;
@@ -23,7 +23,7 @@ interface PhoneOtpFormProps {
 const RESEND_COOLDOWN = 60; // seconds
 
 export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState<string | undefined>();
   const [code, setCode] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [maskedPhone, setMaskedPhone] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
   }, [cooldown]);
 
   const handleSendOtp = async () => {
-    if (!phone.trim()) return;
+    if (!phone?.trim()) return;
     setLoading(true);
     setAlert(null);
 
@@ -95,16 +95,19 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-          <Phone className="w-6 h-6 text-white" />
+      <div className="space-y-4 text-left">
+        <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
+          <Sparkle className="h-3 w-3" />
+          Seamless phone access
         </div>
-        <h3 className="text-2xl font-bold">Phone Verification</h3>
-        <p className="text-muted-foreground">
-          {!otpSent
-            ? "We'll send you a secure verification code"
-            : `Enter the 6-digit code sent to ${maskedPhone ?? 'your phone'}`}
-        </p>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-semibold text-white">Verify with your phone</h3>
+          <p className="text-sm text-slate-300">
+            {!otpSent
+              ? "Pick your country, enter your number, and we'll send you a secure code."
+              : `Enter the 6-digit code sent to ${maskedPhone ?? 'your phone number'}.`}
+          </p>
+        </div>
       </div>
 
       {alert && (
@@ -117,16 +120,23 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         {!otpSent ? (
           <>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
+              <Label htmlFor="phone" className="text-sm font-medium text-slate-200">
+                Phone number
+              </Label>
+              <PhoneInput
                 id="phone"
-                placeholder="+855 12 345 678"
+                name="phone"
+                international
+                withCountryCallingCode
+                defaultCountry="US"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="h-12 text-base"
-                inputMode="tel"
-                autoComplete="tel"
+                onChange={(value: string | undefined) => setPhone(value)}
+                placeholder="Enter phone number"
+                className="bg-slate-900/50"
               />
+              <p className="text-xs text-slate-400">
+                Choose your country to automatically include the correct dialing code.
+              </p>
             </div>
             <Button
               onClick={handleSendOtp}
@@ -148,7 +158,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         ) : (
           <>
             <div className="space-y-2">
-              <Label>Verification Code</Label>
+              <Label className="text-sm font-medium text-slate-200">Verification code</Label>
               <InputOTP
                 maxLength={6}
                 value={code}
@@ -185,35 +195,40 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
               )}
             </Button>
 
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Shield className="w-3 h-3" />
-                <span>Your number is protected</span>
+            <div className="flex flex-col gap-3 rounded-xl border border-white/5 bg-slate-900/50 p-4 text-xs text-slate-300 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2">
+                <Shield className="h-4 w-4 text-emerald-400" />
+                <span>Your number is protected and never shared.</span>
               </div>
-              <div className="flex items-center gap-1">
-                <TimerReset className="w-3 h-3" />
+              <div className="flex items-center gap-2">
+                <TimerReset className="h-4 w-4 text-emerald-400" />
                 <span>{cooldown > 0 ? `Resend available in ${cooldown}s` : 'You can resend now'}</span>
               </div>
             </div>
 
-            <div className="text-center">
+            <div className="flex items-center justify-center">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleResendOtp}
                 disabled={loading || cooldown > 0}
-                className="text-muted-foreground"
+                className="gap-2 text-slate-300 hover:text-white"
               >
-                <RotateCcw className="w-4 h-4 mr-1" />
-                Resend Code
+                <RotateCcw className="h-4 w-4" />
+                Resend code
               </Button>
             </div>
           </>
         )}
       </div>
 
-      <Button variant="ghost" onClick={onBack} className="w-full">
-        ← Back to Sign In Options
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        className="group inline-flex w-auto items-center gap-2 text-sm text-slate-300 hover:text-white"
+      >
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        Back to sign-in options
       </Button>
     </motion.div>
   );

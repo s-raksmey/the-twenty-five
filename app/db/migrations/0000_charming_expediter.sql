@@ -28,10 +28,13 @@ CREATE TABLE `users` (
 	`name` text,
 	`email` text,
 	`emailVerified` integer,
-	`image` text
+	`image` text,
+	`phoneNumberHash` text,
+	`phoneNumberLast4` text
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `users_email_unique` ON `users` (`email`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_phoneNumberHash_unique` ON `users` (`phoneNumberHash`);--> statement-breakpoint
 CREATE TABLE `verification_tokens` (
 	`identifier` text NOT NULL,
 	`token` text NOT NULL,

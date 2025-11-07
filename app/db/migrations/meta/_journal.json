@@ -8,6 +8,13 @@
       "when": 1761890987921,
       "tag": "0000_mysterious_imperial_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761890987922,
+      "tag": "0001_secure_phone_auth",
+      "breakpoints": true
     }
   ]
 }

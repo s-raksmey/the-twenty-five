@@ -20,6 +20,17 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+### Environment variables for phone sign-in
+
+Phone-based authentication relies on two secrets to protect user data:
+
+| Variable | Description |
+| --- | --- |
+| `PHONE_NUMBER_SECRET` | Secret used to hash phone numbers before storing them in the database. |
+| `OTP_SECRET` | Secret used to hash one-time passcodes before persisting them. |
+
+Add both keys to your `.env.local` file before requesting OTP codes. Use long, random strings.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

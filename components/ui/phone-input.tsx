@@ -1,13 +1,13 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import PhoneInputPrimitive from 'react-phone-number-input';
-import type { Country, Value } from 'react-phone-number-input';
-import flags from 'react-phone-number-input/flags';
-import { getCountryCallingCode } from 'react-phone-number-input';
-import { Check, ChevronsUpDown, Globe } from 'lucide-react';
+import * as React from 'react'
+import PhoneInputPrimitive from 'react-phone-number-input'
+import type { Country, Value } from 'react-phone-number-input'
+import flags from 'react-phone-number-input/flags'
+import { getCountryCallingCode } from 'react-phone-number-input'
+import { Check, ChevronsUpDown, Globe, Loader2 } from 'lucide-react'
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'
 import {
   Command,
   CommandEmpty,
@@ -15,163 +15,222 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+} from '@/components/ui/command'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
-type PhoneInputElement = React.ComponentRef<typeof PhoneInputPrimitive>;
+// ─── Types ───────────────────────────────────────────────────────────────
+type PhoneInputElement = React.ComponentRef<typeof PhoneInputPrimitive>
 type PhoneInputProps = React.ComponentProps<typeof PhoneInputPrimitive> & {
-  className?: string;
-};
+  className?: string
+}
 
 type CountrySelectOption = {
-  value: string;
-  label: string;
-  icon?: React.ComponentType<{ title: string }>;
-};
+  value: string
+  label: string
+  icon?: React.ComponentType<{ title: string }>
+}
 
 type CountrySelectProps = {
-  value?: string;
-  onChange: (value?: string) => void;
-  options: CountrySelectOption[];
-  disabled?: boolean;
-  labels?: Record<string, string>;
-};
+  value?: string
+  onChange: (value?: string) => void
+  options: CountrySelectOption[]
+  disabled?: boolean
+  labels?: Record<string, string>
+}
 
+// ─── Country Data ────────────────────────────────────────────────────────
+const allCountries: CountrySelectOption[] = (Object.keys(flags) as Country[])
+  .filter((code) => !!flags[code])
+  .map((code) => ({
+    value: code,
+    label: new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || code,
+    icon: flags[code]!,
+  }))
+
+// ─── Input Field ─────────────────────────────────────────────────────────
 const InputField = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<'input'>>(
   ({ className, ...props }, ref) => (
     <input
       ref={ref}
       className={cn(
-        'flex-1 bg-transparent text-base font-medium text-white placeholder:text-slate-400 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60',
+        'flex-1 bg-transparent text-base font-medium text-white placeholder:text-slate-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60',
         className,
       )}
       {...props}
     />
   ),
-);
-InputField.displayName = 'PhoneInputField';
+)
+InputField.displayName = 'PhoneInputField'
 
-const getCallingCode = (country?: string) => {
-  if (!country) return '';
+const getCodeSafe = (country?: string) => {
+  if (!country) return ''
   try {
-    return getCountryCallingCode(country as Country);
+    return getCountryCallingCode(country as Country)
   } catch {
-    return '';
+    return ''
   }
-};
+}
 
+// ─── Country Select ──────────────────────────────────────────────────────
 const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySelectProps) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
 
-  const selected = React.useMemo(
-    () => options.find((option) => option.value === value),
-    [options, value],
-  );
-
-  const labelFor = React.useCallback(
-    (option: CountrySelectOption) => labels?.[option.value] ?? option.label,
-    [labels],
-  );
-
-  const selectedCode = React.useMemo(() => getCallingCode(selected?.value), [selected?.value]);
-  const selectedLabel = selected ? labelFor(selected) : 'Select country';
+  const selected = options.find((option) => option.value === value)
+  const selectedLabel = selected
+    ? labels?.[selected.value] ?? selected.label
+    : 'Select Country'
+  const selectedCode = getCodeSafe(selected?.value)
+  const SelectedIcon = selected?.icon
 
   const handleSelect = (country?: string) => {
-    onChange(country);
-    setOpen(false);
-  };
-
-  const SelectedIcon = selected?.icon;
+    setLoading(true)
+    setTimeout(() => {
+      onChange(country)
+      setLoading(false)
+      setOpen(false)
+    }, 500)
+  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-medium text-white shadow-[0_1px_0_rgba(255,255,255,0.08)] transition hover:bg-white/10 focus-visible:ring-0 focus-visible:ring-offset-0"
-          disabled={disabled}
+    <div className="flex flex-col gap-1">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'flex h-10 min-w-[120px] items-center justify-between gap-2 rounded-lg border border-primary/40 bg-slate-900/70 px-2.5 text-sm text-white transition-all duration-200',
+              'hover:bg-slate-800 hover:border-primary/60 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]',
+              disabled && 'opacity-50 cursor-not-allowed',
+            )}
+          >
+            <div className="flex items-center gap-2">
+              {SelectedIcon ? (
+                <span className="transition-transform duration-300 hover:scale-110">
+                  <SelectedIcon key={selected?.value} title={selectedLabel} />
+                </span>
+              ) : (
+                <Globe className="h-4 w-4 text-primary/70" />
+              )}
+              <span className="text-xs uppercase tracking-wide text-slate-100 truncate max-w-[60px]">
+                {selectedLabel}
+              </span>
+            </div>
+            {selectedCode && (
+              <span className="text-xs text-primary/80 whitespace-nowrap">+{selectedCode}</span>
+            )}
+            <ChevronsUpDown className="h-4 w-4 text-slate-400 shrink-0" />
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+          align="start"
+          side="bottom"
+          sideOffset={6}
+          avoidCollisions={false}
+          className="w-[260px] border border-slate-700 bg-slate-900 text-white rounded-md shadow-xl overflow-hidden"
         >
-          {SelectedIcon ? <SelectedIcon title={selectedLabel} /> : <Globe className="h-4 w-4" />}
-          <span className="text-xs uppercase tracking-wide text-slate-200/80">{selectedLabel}</span>
-          {selectedCode && <span className="text-xs text-emerald-300">+{selectedCode}</span>}
-          <ChevronsUpDown className="h-4 w-4 text-slate-300" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 border border-white/10 bg-slate-900/95 p-0 text-white">
-        <Command>
-          <CommandInput placeholder="Search country" className="border-0 focus-visible:ring-0" />
-          <CommandList>
-            <CommandEmpty className="py-6 text-center text-sm text-slate-400">No country found.</CommandEmpty>
-            <CommandGroup className="max-h-64 overflow-y-auto">
-              {options.map((option) => {
-                const Icon = option.icon;
-                const label = labelFor(option);
-                const code = getCallingCode(option.value);
-                const isActive = option.value === value;
+          <Command className="w-full">
+            <div className="p-2 border-b border-slate-700">
+              <CommandInput
+                placeholder="Search country..."
+                className="text-sm text-white border border-slate-700 rounded-md px-3 py-1.5 bg-slate-800 focus-visible:ring-2 focus-visible:ring-primary/40"
+              />
+            </div>
 
-                return (
-                  <CommandItem
-                    key={option.value}
-                    value={label}
-                    className="flex items-center gap-3 py-2 text-sm"
-                    onSelect={() => handleSelect(option.value)}
-                  >
-                    {Icon ? <Icon title={label} /> : <Globe className="h-4 w-4" />}
-                    <span className="flex-1 text-left text-sm">{label}</span>
-                    {code && <span className="text-xs text-slate-400">+{code}</span>}
-                    {isActive && <Check className="h-4 w-4 text-emerald-300" />}
-                  </CommandItem>
-                );
-              })}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  );
-};
+            {/* FIXED: Allow scrolling anywhere inside the list */}
+            <div className="max-h-[240px] overflow-auto scroll-smooth touch-pan-y px-1 py-1 pointer-events-auto">
+              <CommandList className="overflow-visible">
+                <CommandEmpty className="py-4 text-center text-sm text-slate-400">
+                  No country found.
+                </CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => {
+                    const Icon = option.icon
+                    const code = getCodeSafe(option.value)
+                    const isActive = option.value === value
 
-CountrySelect.displayName = 'PhoneCountrySelect';
+                    return (
+                      <CommandItem
+                        key={option.value}
+                        value={option.label}
+                        onSelect={() => handleSelect(option.value)}
+                        className={cn(
+                          'flex items-center gap-2 py-1.5 px-3 rounded-md text-sm cursor-pointer transition-colors select-none',
+                          'hover:bg-slate-800 hover:text-white',
+                          isActive && 'bg-primary/25 text-primary',
+                        )}
+                      >
+                        {Icon ? (
+                          <Icon title={option.label} />
+                        ) : (
+                          <Globe className="h-4 w-4 text-primary/70" />
+                        )}
+                        <span className="flex-1 truncate">{option.label}</span>
+                        {code && <span className="text-xs text-primary/70">+{code}</span>}
+                        {isActive && <Check className="h-4 w-4 text-primary" />}
+                      </CommandItem>
+                    )
+                  })}
+                </CommandGroup>
+              </CommandList>
+            </div>
+          </Command>
+        </PopoverContent>
+      </Popover>
 
-export const PhoneInput = React.forwardRef<PhoneInputElement, PhoneInputProps>((props, ref) => {
-  const {
-    className,
-    inputComponent,
-    countrySelectComponent,
-    smartCaret,
-    international,
-    withCountryCallingCode,
-    value,
-    onChange,
-    ...rest
-  } = props;
-
-  const resolvedSmartCaret = smartCaret ?? false;
-  const resolvedInternational = international ?? true;
-  const resolvedWithCountryCallingCode = withCountryCallingCode ?? true;
-
-  return (
-    <PhoneInputPrimitive
-      ref={ref}
-      flags={flags}
-      international={resolvedInternational}
-      withCountryCallingCode={resolvedWithCountryCallingCode}
-      smartCaret={resolvedSmartCaret}
-      countrySelectComponent={countrySelectComponent ?? CountrySelect}
-      inputComponent={inputComponent ?? InputField}
-      value={value}
-      onChange={onChange}
-      className={cn(
-        'flex h-12 w-full items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/60 px-3 text-base text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all focus-within:border-emerald-400 focus-within:shadow-[0_0_0_2px_rgba(16,185,129,0.25)]',
-        className,
+      {loading && (
+        <div className="flex items-center justify-center gap-2 text-primary/80 text-xs mt-1">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>Loading...</span>
+        </div>
       )}
-      {...rest}
-    />
-  );
-});
-PhoneInput.displayName = 'PhoneInput';
+    </div>
+  )
+}
+CountrySelect.displayName = 'PhoneCountrySelect'
 
-export type { Value as PhoneNumberValue };
+// ─── Main Phone Input ────────────────────────────────────────────────────
+export const PhoneInput = React.forwardRef<PhoneInputElement, PhoneInputProps>(
+  (
+    {
+      className,
+      inputComponent,
+      smartCaret = false,
+      international = true,
+      withCountryCallingCode = true,
+      value,
+      onChange,
+      ...rest
+    },
+    ref,
+  ) => {
+    return (
+      <PhoneInputPrimitive
+        ref={ref}
+        flags={flags}
+        international={international}
+        withCountryCallingCode={withCountryCallingCode}
+        smartCaret={smartCaret}
+        countrySelectComponent={(props) => (
+          <CountrySelect {...props} options={allCountries} />
+        )}
+        inputComponent={inputComponent ?? InputField}
+        value={value}
+        onChange={onChange}
+        className={cn(
+          'flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 text-base text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all',
+          'focus-within:border-primary focus-within:shadow-[0_0_0_2px_rgba(16,185,129,0.4)]',
+          className,
+        )}
+        {...rest}
+      />
+    )
+  },
+)
+PhoneInput.displayName = 'PhoneInput'
+
+export type { Value as PhoneNumberValue }

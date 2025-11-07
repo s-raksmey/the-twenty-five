@@ -1,13 +1,12 @@
-'use client';
+"use client"
 
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion, Variants } from 'framer-motion';
-import { signOut, useSession } from 'next-auth/react';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { motion, type Variants } from "framer-motion"
+import { signOut, useSession } from "next-auth/react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,120 +14,102 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
-import { SignInDialog } from '@/components/authentication/SignInDialog';
+} from "@/components/ui/dropdown-menu"
+import { Skeleton } from "@/components/ui/skeleton"
+import { SignInDialog } from "@/components/authentication/SignInDialog"
 
 const navContainer: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.15, delayChildren: 0.3 } },
-};
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
+}
 
 const navItem: Variants = {
-  hidden: { opacity: 0, y: -10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
-};
+  hidden: { opacity: 0, y: -8 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
+}
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(false);
+  const { data: session, status } = useSession()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(false)
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const getInitials = (name: string) =>
     name
-      .split(' ')
+      .split(" ")
       .map((n) => n[0])
-      .join('')
-      .toUpperCase();
+      .join("")
+      .toUpperCase()
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Features', href: '/features' },
-    { name: 'Pricing', href: '/pricing' },
-    { name: 'About', href: '/about' },
-  ];
-
-  const handleSignOut = () => signOut({ callbackUrl: '/' });
+    { name: "Home", href: "/" },
+    { name: "Features", href: "/features" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "About", href: "/about" },
+  ]
 
   return (
     <motion.nav
-      initial={{ y: -40, opacity: 0 }}
+      initial={{ y: -30, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={`sticky top-0 z-50 bg-background/95 backdrop-blur border-b transition-all duration-300 ${
-        isScrolled ? 'shadow-sm' : ''
-      }`}
+      transition={{ duration: 0.4 }}
+      className={`sticky top-0 z-50 border-b backdrop-blur-sm transition-shadow ${
+        isScrolled ? "shadow-md" : ""
+      } bg-background/80`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex items-center space-x-3 shrink-0"
-          >
-            <div className="w-10 h-10 relative">
-              <Image
-                src="/logo.jpg"
-                alt="THE TWENTY FIVE Logo"
-                width={40}
-                height={40}
-                className="rounded-full"
-                priority
-              />
-            </div>
-            <span className="text-xl sm:text-2xl font-bold tracking-tight">
-              THE TWENTY FIVE
-            </span>
-          </motion.div>
+      <div className="container mx-auto flex items-center justify-between px-4 py-4 md:py-5">
+        {/* Logo */}
+        <div className="flex items-center space-x-3">
+          <Image src="/logo.jpg" alt="THE TWENTY FIVE" width={40} height={40} className="rounded-full" />
+          <span className="text-lg sm:text-xl font-bold tracking-tight">THE TWENTY FIVE</span>
+        </div>
 
-          {/* Navigation */}
-          <motion.div
-            className="hidden md:flex items-center space-x-8"
-            variants={navContainer}
-            initial="hidden"
-            animate="show"
-          >
-            {navigation.map((item) => (
-              <motion.div key={item.name} variants={navItem}>
-                <Link
-                  href={item.href}
-                  className="text-sm font-medium transition-colors hover:text-primary text-foreground/80"
-                >
-                  {item.name}
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+        {/* Navigation */}
+        <motion.ul
+          className="hidden md:flex items-center space-x-8"
+          variants={navContainer}
+          initial="hidden"
+          animate="show"
+        >
+          {navigation.map((item) => (
+            <motion.li key={item.name} variants={navItem}>
+              <Link
+                href={item.href}
+                className="text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+              >
+                {item.name}
+              </Link>
+            </motion.li>
+          ))}
+        </motion.ul>
 
-          {/* Auth Section */}
-          {status === 'loading' ? (
-            <Skeleton className="h-8 w-20" />
+        {/* Authentication */}
+        <div className="flex items-center gap-4">
+          {status === "loading" ? (
+            <Skeleton className="h-8 w-20 rounded-full" />
           ) : session ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={session.user?.image || ''} alt={session.user?.name || ''} />
-                    <AvatarFallback className="bg-gradient-to-r from-primary to-secondary text-white text-xs">
-                      {session.user?.name ? getInitials(session.user.name) : 'U'}
+                <Button variant="ghost" className="h-10 w-10 p-0 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={session.user?.image ?? ""} />
+                    <AvatarFallback className="bg-primary text-white text-xs">
+                      {session.user?.name ? getInitials(session.user.name) : "U"}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium">{session.user?.name}</p>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold">{session.user?.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {session.user?.email ?? session.user?.phoneMasked ?? ''}
+                      {session.user?.email ?? session.user?.phoneMasked ?? ""}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -138,8 +119,8 @@ export default function Navbar() {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={handleSignOut}
-                  className="text-red-600 focus:text-red-600"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="text-red-500 focus:text-red-600"
                 >
                   Sign Out
                 </DropdownMenuItem>
@@ -151,5 +132,5 @@ export default function Navbar() {
         </div>
       </div>
     </motion.nav>
-  );
+  )
 }

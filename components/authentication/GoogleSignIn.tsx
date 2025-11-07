@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Mail, Shield } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 
@@ -19,34 +19,50 @@ export function GoogleSignIn({ onBack }: GoogleSignInProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      className="space-y-6"
+      className="space-y-8"
     >
-      <div className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-full flex items-center justify-center">
-          <Mail className="w-6 h-6 text-white" />
+      <div className="space-y-4 text-left">
+        <div className="inline-flex items-center gap-2 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-200">
+          <CheckCircle className="h-3 w-3" />
+          One-click access
         </div>
-        <h3 className="text-2xl font-bold">Google Sign In</h3>
-        <p className="text-muted-foreground">Secure and fast authentication with Google</p>
+        <div className="space-y-2">
+          <h3 className="text-2xl font-semibold text-white">Continue with Google</h3>
+          <p className="text-sm text-slate-300">
+            Sign in instantly using your Google account. We never store your password and you can revoke access anytime.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-4">
         <Button
           onClick={handleGoogleSignIn}
-          className="w-full h-12 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700"
+          className="inline-flex h-12 w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-red-500 via-orange-500 to-amber-500 text-base font-medium text-white shadow-lg shadow-red-500/30 transition hover:shadow-red-500/50"
           size="lg"
         >
-          <Mail className="w-5 h-5 mr-3" />
+          <Mail className="h-5 w-5" />
           Continue with Google
         </Button>
 
-        <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
-          <Shield className="w-3 h-3" />
-          <span>Protected by Google&apos;s security</span>
+        <div className="flex flex-col gap-3 rounded-xl border border-white/5 bg-slate-900/50 p-4 text-xs text-slate-300 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-red-300" />
+            <span>Secure OAuth 2.0 connection handled by Google.</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Mail className="h-4 w-4 text-red-300" />
+            <span>We only receive your name and email address.</span>
+          </div>
         </div>
       </div>
 
-      <Button variant="ghost" onClick={onBack} className="w-full">
-        ← Back to Sign In Options
+      <Button
+        variant="ghost"
+        onClick={onBack}
+        className="group inline-flex w-auto items-center gap-2 text-sm text-slate-300 hover:text-white"
+      >
+        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+        Back to sign-in options
       </Button>
     </motion.div>
   );

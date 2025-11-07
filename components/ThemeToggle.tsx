@@ -1,9 +1,9 @@
 // components/ThemeToggle.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Moon, Sun } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,13 +14,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// components/ThemeToggle.tsx
-
-// components/ThemeToggle.tsx
-
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -40,18 +37,43 @@ export default function ThemeToggle() {
   useEffect(() => {
     if (!mounted) return;
 
+    const root = document.documentElement;
+
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
       localStorage.setItem('theme', 'light');
     }
   }, [isDark, mounted]);
 
-  const toggleTheme = () => {
+  useEffect(() => {
+    if (!mounted) return;
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handlePreferenceChange = (event: MediaQueryListEvent) => {
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) return;
+      setIsDark(event.matches);
+    };
+
+    mediaQuery.addEventListener('change', handlePreferenceChange);
+
+    return () => mediaQuery.removeEventListener('change', handlePreferenceChange);
+  }, [mounted]);
+
+  const toggleTheme = useCallback(() => {
     setIsDark(prev => !prev);
-  };
+  }, []);
+
+  const interactionMotion = useMemo(
+    () => ({
+      whileHover: prefersReducedMotion ? undefined : { scale: 1.05 },
+      whileTap: prefersReducedMotion ? undefined : { scale: 0.95 },
+    }),
+    [prefersReducedMotion]
+  );
 
   if (!mounted) {
     return (
@@ -71,24 +93,28 @@ export default function ThemeToggle() {
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.div
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            {...interactionMotion}
             className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50"
           >
             <Button
               variant="outline"
               size="icon"
-              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-lg backdrop-blur-sm bg-background/80 border"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full shadow-lg backdrop-blur-sm bg-background/80 border focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               onClick={toggleTheme}
               aria-label={
                 isDark ? 'Switch to light mode' : 'Switch to dark mode'
               }
+              aria-pressed={isDark}
+              data-state={isDark ? 'dark' : 'light'}
             >
               {isDark ? (
                 <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
               ) : (
                 <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
+              <span className="sr-only">
+                {isDark ? 'Dark theme enabled' : 'Light theme enabled'}
+              </span>
             </Button>
           </motion.div>
         </TooltipTrigger>

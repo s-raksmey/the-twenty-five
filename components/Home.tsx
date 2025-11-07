@@ -7,28 +7,24 @@ import HeroSection from '@/components/HeroSection';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-// components/Home.tsx
-
-// components/Home.tsx
-
 export default function Home() {
   const features = [
     {
       icon: <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: 'AI Powered',
       description:
-        'Leverage cutting-edge artificial intelligence for enhanced productivity',
+        'Leverage cutting-edge artificial intelligence for enhanced productivity.',
     },
     {
       icon: <Zap className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: 'Lightning Fast',
       description:
-        'Built for speed with optimized performance and instant responses',
+        'Built for speed with optimized performance and instant responses.',
     },
     {
       icon: <Users className="w-5 h-5 sm:w-6 sm:h-6" />,
       title: 'Collaborative',
-      description: 'Work seamlessly with your team in real-time collaboration',
+      description: 'Work seamlessly with your team in real-time collaboration.',
     },
   ];
 
@@ -44,15 +40,14 @@ export default function Home() {
               Why Choose <span className="gradient-text">MyApp</span>?
             </h2>
             <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Experience the future of productivity with our innovative platform
-              designed for modern teams and individuals.
+              Experience the future of productivity with our innovative platform designed for modern teams and individuals.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {features.map((feature, index) => (
+            {features.map(feature => (
               <Card
-                key={index}
+                key={feature.title}
                 className="group hover:shadow-lg transition-all duration-300 border-0 bg-card/50 backdrop-blur-sm"
               >
                 <CardContent className="p-6 sm:p-8 text-center">
@@ -81,14 +76,10 @@ export default function Home() {
                 Ready to Get Started?
               </h2>
               <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-0">
-                Join thousands of users who are already transforming their
-                workflow with our platform.
+                Join thousands of users who are already transforming their workflow with our platform.
               </p>
-              <Button
-                size="lg"
-                className="gap-2 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg"
-              >
-                Get Started Free{' '}
+              <Button size="lg" className="gap-2 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg">
+                Get Started Free
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </CardContent>

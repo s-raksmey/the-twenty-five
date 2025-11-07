@@ -14,10 +14,6 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 
-// components/ThemeToggle.tsx
-
-// components/ThemeToggle.tsx
-
 export default function ThemeToggle() {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);

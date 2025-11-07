@@ -1,12 +1,21 @@
-import { type NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import nodemailer from 'nodemailer';
+import crypto from 'crypto';
 
-import { TursoDrizzleAdapter } from "./auth-adapter";
-import { EmailValidator } from "./email-validator";
-import { db } from "@/app/db";
-import { users } from "@/app/db/schema";
-import { eq } from "drizzle-orm";
+import { db } from '@/app/db';
+import { users, verificationTokens } from '@/app/db/schema';
+import { TursoDrizzleAdapter } from '@/lib/auth-adapter';
+import { EmailValidator } from '@/lib/email-validator';
+import {
+  hashOtpCode,
+  hashPhoneNumber,
+  maskPhoneFromLastFour,
+  normalizePhoneNumber,
+} from '@/lib/phone-auth';
+import { and, eq } from 'drizzle-orm';
+import { type NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import nodemailer from 'nodemailer';
+import { z } from 'zod';
 
 // Define proper types for Google profile
 interface GoogleProfile {
@@ -17,9 +26,110 @@ interface GoogleProfile {
   sub?: string;
 }
 
+const phoneCredentialsSchema = z.object({
+  phone: z.string().min(6),
+  code: z
+    .string()
+    .trim()
+    .regex(/^[0-9]{6}$/, 'Verification code must contain exactly 6 digits.'),
+});
+
 export const authOptions: NextAuthOptions = {
   adapter: TursoDrizzleAdapter,
   providers: [
+    CredentialsProvider({
+      id: 'phone',
+      name: 'Phone',
+      credentials: {
+        phone: { label: 'Phone', type: 'text' },
+        code: { label: 'Code', type: 'text' },
+      },
+      async authorize(credentials) {
+        const parsed = phoneCredentialsSchema.safeParse(credentials);
+
+        if (!parsed.success) {
+          throw new Error('Please provide a valid phone number and verification code.');
+        }
+
+        const normalizedPhone = normalizePhoneNumber(parsed.data.phone);
+        const phoneHash = hashPhoneNumber(normalizedPhone);
+        const hashedCode = hashOtpCode(parsed.data.code);
+
+        const [verification] = await db
+          .select()
+          .from(verificationTokens)
+          .where(
+            and(
+              eq(verificationTokens.identifier, phoneHash),
+              eq(verificationTokens.token, hashedCode)
+            )
+          )
+          .limit(1);
+
+        if (!verification) {
+          throw new Error('Invalid verification code.');
+        }
+
+        const expiresAt =
+          verification.expires instanceof Date
+            ? verification.expires
+            : new Date(verification.expires);
+
+        if (expiresAt.getTime() < Date.now()) {
+          await db
+            .delete(verificationTokens)
+            .where(eq(verificationTokens.identifier, phoneHash));
+          throw new Error('Your verification code has expired. Please request a new one.');
+        }
+
+        await db
+          .delete(verificationTokens)
+          .where(eq(verificationTokens.identifier, phoneHash));
+
+        const lastFour = normalizedPhone.slice(-4);
+
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.phoneNumberHash, phoneHash))
+          .limit(1);
+
+        let userRecord = existingUser[0];
+
+        if (!userRecord) {
+          const [created] = await db
+            .insert(users)
+            .values({
+              id: crypto.randomUUID(),
+              name: `Phone ${lastFour}`,
+              phoneNumberHash: phoneHash,
+              phoneNumberLast4: lastFour,
+            })
+            .returning();
+
+          userRecord = created;
+        } else if (!userRecord.phoneNumberLast4) {
+          await db
+            .update(users)
+            .set({ phoneNumberLast4: lastFour })
+            .where(eq(users.id, userRecord.id));
+
+          userRecord = { ...userRecord, phoneNumberLast4: lastFour };
+        }
+
+        const storedLastFour = userRecord.phoneNumberLast4 ?? lastFour;
+        const masked = maskPhoneFromLastFour(storedLastFour);
+
+        return {
+          id: userRecord.id,
+          name: userRecord.name ?? `Phone ${storedLastFour}`,
+          email: userRecord.email ?? undefined,
+          emailVerified: Boolean(userRecord.emailVerified),
+          phoneMasked: masked,
+          phoneLast4: storedLastFour,
+        };
+      },
+    }),
     GoogleProvider({
       clientId: process.env["GOOGLE_CLIENT_ID"]!,
       clientSecret: process.env["GOOGLE_CLIENT_SECRET"]!,
@@ -127,15 +237,45 @@ export const authOptions: NextAuthOptions = {
     },
 
     // ✅ JWT CALLBACK
-    async jwt({ token, account, profile }) {
+    async jwt({ token, account, profile, user }) {
       if (account) {
         if (account.access_token) {
           token.accessToken = account.access_token;
         }
 
-        const googleProfile = profile as GoogleProfile;
-        token.emailVerified = googleProfile?.email_verified || false;
-        token.isLikelyFake = EmailValidator.isLikelyFake(token.email || "");
+        if (account.provider === 'google') {
+          const googleProfile = profile as GoogleProfile;
+          token.emailVerified = googleProfile?.email_verified || false;
+          token.isLikelyFake = EmailValidator.isLikelyFake(token.email || "");
+          token.phoneMasked = undefined;
+          token.phoneLast4 = undefined;
+          token.phoneLogin = false;
+        }
+
+        if (account.provider === 'credentials') {
+          token.phoneLogin = true;
+          token.isLikelyFake = false;
+        }
+      }
+
+      if (user && typeof user === 'object') {
+        const typedUser = user as {
+          emailVerified?: boolean;
+          phoneMasked?: string;
+          phoneLast4?: string;
+        };
+
+        if (typeof typedUser.emailVerified !== 'undefined') {
+          token.emailVerified = Boolean(typedUser.emailVerified);
+        }
+
+        if (typedUser.phoneMasked) {
+          token.phoneMasked = typedUser.phoneMasked;
+        }
+
+        if (typedUser.phoneLast4) {
+          token.phoneLast4 = typedUser.phoneLast4;
+        }
       }
       return token;
     },
@@ -150,6 +290,18 @@ export const authOptions: NextAuthOptions = {
 
         if (typeof token.isLikelyFake !== "undefined") {
           session.user.isLikelyFake = token.isLikelyFake;
+        }
+
+        if (typeof token.phoneLogin !== 'undefined') {
+          session.user.phoneLogin = token.phoneLogin;
+        }
+
+        if (token.phoneMasked) {
+          session.user.phoneMasked = token.phoneMasked;
+        }
+
+        if (token.phoneLast4) {
+          session.user.phoneLast4 = token.phoneLast4;
         }
       }
       return session;

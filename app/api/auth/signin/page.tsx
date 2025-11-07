@@ -1,51 +1,234 @@
-// app/auth/signin/page.tsx
 'use client';
 
-import { Shield } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+import { MessageSquareLock, Shield, Smartphone } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-// app/auth/signin/page.tsx
-
-// app/auth/signin/page.tsx
+const RESEND_COOLDOWN_SECONDS = 60;
 
 export default function SignInPage() {
-  const handleSignIn = () => {
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [otpRequested, setOtpRequested] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusVariant, setStatusVariant] = useState<'success' | 'error' | 'info' | null>(null);
+  const [maskedPhone, setMaskedPhone] = useState('');
+  const [debugCode, setDebugCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setCooldown((value) => (value > 0 ? value - 1 : 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [cooldown]);
+
+  const resetStatus = () => {
+    setStatusMessage(null);
+    setStatusVariant(null);
+  };
+
+  const handleGoogleSignIn = () => {
     signIn('google', { callbackUrl: '/' });
   };
+
+  const handleRequestCode = async () => {
+    resetStatus();
+    setIsRequestingCode(true);
+
+    try {
+      const response = await fetch('/api/auth/phone/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        const errorMessage =
+          data?.message ||
+          data?.errors?.phone?.[0] ||
+          'We could not send a verification code. Please try again.';
+
+        setStatusVariant('error');
+        setStatusMessage(errorMessage);
+        return;
+      }
+
+      const maskedTarget = data.maskedPhone ?? 'your phone';
+      setOtpRequested(true);
+      setCooldown(RESEND_COOLDOWN_SECONDS);
+      setMaskedPhone(maskedTarget);
+      setDebugCode(data.debugCode ?? null);
+      setStatusVariant('success');
+      setStatusMessage(`Verification code sent to ${maskedTarget}.`);
+    } catch (error) {
+      console.error('Failed to request OTP', error);
+      setStatusVariant('error');
+      setStatusMessage('Something went wrong. Please try again.');
+    } finally {
+      setIsRequestingCode(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    resetStatus();
+    setIsVerifyingCode(true);
+
+    try {
+      const result = await signIn('phone', {
+        phone,
+        code,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setStatusVariant('error');
+        setStatusMessage(result.error);
+        return;
+      }
+
+      const destination = result?.url ?? '/';
+      window.location.href = destination;
+    } catch (error) {
+      console.error('Failed to verify OTP', error);
+      setStatusVariant('error');
+      setStatusMessage('Unable to verify the code. Please try again.');
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  const showDebugCode =
+    debugCode && process.env.NODE_ENV !== 'production' && otpRequested;
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background to-muted">
       <div className="w-full max-w-md space-y-8 rounded-xl bg-card p-8 shadow-lg border">
-        <div className="text-center">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-white" />
+        <div className="text-center space-y-2">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-primary to-secondary">
+            <Shield className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold">Secure Sign In</h1>
-          <p className="mt-2 text-muted-foreground">
-            Use your verified Google account to continue
+          <p className="text-muted-foreground">
+            Use a verified Google account or a protected phone number to access
+            your workspace.
           </p>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-6">
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              We verify all accounts to ensure security. Temporary or fake
-              emails will be rejected.
+              We verify every login to keep your account safe. Disposable
+              emails and unverified phone numbers are blocked.
             </AlertDescription>
           </Alert>
 
-          <Button
-            onClick={handleSignIn}
-            className="flex w-full items-center justify-center gap-3"
-            size="lg"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </Button>
+          <div className="space-y-4 rounded-lg border p-4">
+            <div className="flex items-center gap-2">
+              <Smartphone className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Sign in with your phone</h2>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="phone-input">
+                Phone number
+              </label>
+              <Input
+                id="phone-input"
+                placeholder="e.g. +15551234567"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+                inputMode="tel"
+                autoComplete="tel"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter a phone number with your country code. We store only a
+                protected hash and the last four digits for your security.
+              </p>
+            </div>
+
+            <Button
+              onClick={handleRequestCode}
+              disabled={isRequestingCode || cooldown > 0 || phone.trim().length === 0}
+              className="w-full"
+              variant="secondary"
+            >
+              {cooldown > 0
+                ? `Resend code in ${cooldown}s`
+                : 'Send verification code'}
+            </Button>
+
+            {otpRequested && (
+              <div className="space-y-3 pt-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium" htmlFor="otp-input">
+                    One-time passcode
+                  </label>
+                  <Input
+                    id="otp-input"
+                    placeholder="6-digit code"
+                    value={code}
+                    onChange={(event) => setCode(event.target.value)}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                  />
+                </div>
+
+                <Button
+                  onClick={handleVerifyCode}
+                  disabled={isVerifyingCode || code.trim().length < 6}
+                  className="w-full"
+                >
+                  {isVerifyingCode ? 'Verifying…' : 'Verify and continue'}
+                </Button>
+
+                {showDebugCode && (
+                  <p className="text-xs text-muted-foreground">
+                    Development code for {maskedPhone}: <strong>{debugCode}</strong>
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <MessageSquareLock className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold">Or continue with Google</h2>
+            </div>
+
+            <Button
+              onClick={handleGoogleSignIn}
+              className="flex w-full items-center justify-center gap-3"
+              size="lg"
+            >
+              <GoogleIcon />
+              Continue with Google
+            </Button>
+          </div>
+
+          {statusMessage && statusVariant && (
+            <Alert
+              variant={statusVariant === 'error' ? 'destructive' : undefined}
+              className="border"
+            >
+              <AlertDescription className="text-sm">
+                {statusMessage}
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
       </div>
     </div>

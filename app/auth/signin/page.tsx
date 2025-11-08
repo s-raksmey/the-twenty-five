@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { useSearchParams } from 'next/navigation';
+
 import {
   ArrowRight,
   CheckCircle2,
@@ -24,6 +26,8 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+
+import { cn } from '@/lib/utils';
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -73,6 +77,9 @@ export default function SignInPage() {
   >(null);
   const [maskedPhone, setMaskedPhone] = useState('');
   const [debugCode, setDebugCode] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const isCompact = searchParams.get('mode') === 'compact';
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/';
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -89,7 +96,7 @@ export default function SignInPage() {
   };
 
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/' });
+    signIn('google', { callbackUrl });
   };
 
   const handleRequestCode = async () => {
@@ -141,6 +148,7 @@ export default function SignInPage() {
         phone,
         code,
         redirect: false,
+        callbackUrl,
       });
 
       if (result?.error) {
@@ -149,7 +157,7 @@ export default function SignInPage() {
         return;
       }
 
-      const destination = result?.url ?? '/';
+      const destination = result?.url ?? callbackUrl;
       window.location.href = destination;
     } catch (error) {
       console.error('Failed to verify OTP', error);
@@ -168,59 +176,78 @@ export default function SignInPage() {
       <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
       <div className="pointer-events-none absolute -right-28 bottom-10 h-80 w-80 rounded-full bg-secondary/20 blur-3xl" />
 
-      <div className="container relative mx-auto grid min-h-screen items-center gap-16 px-4 py-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:py-24">
-        <section className="space-y-10">
-          <Badge
-            variant="secondary"
-            className="bg-white/70 text-foreground backdrop-blur"
-          >
-            Access the ritual platform
-          </Badge>
-          <div className="space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-              Sign in to stay on track with your twenty five
-            </h1>
-            <p className="text-base text-muted-foreground sm:text-lg">
-              Choose the sign-in method that fits your flow. We combine strong
-              security with a calm, guided experience so you can get back to
-              doing the work that matters.
-            </p>
-          </div>
+      <div
+        className={cn(
+          'container relative mx-auto min-h-screen px-4 py-16',
+          isCompact
+            ? 'flex max-w-lg flex-col items-center justify-center gap-10'
+            : 'grid items-center gap-16 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:py-24'
+        )}
+      >
+        {!isCompact && (
+          <section className="space-y-10">
+            <Badge
+              variant="secondary"
+              className="bg-white/70 text-foreground backdrop-blur"
+            >
+              Access the ritual platform
+            </Badge>
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+                Sign in to stay on track with your twenty five
+              </h1>
+              <p className="text-base text-muted-foreground sm:text-lg">
+                Choose the sign-in method that fits your flow. We combine strong
+                security with a calm, guided experience so you can get back to
+                doing the work that matters.
+              </p>
+            </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {highlightFeatures.map(feature => (
-              <Card
-                key={feature.title}
-                className="border border-white/20 bg-white/60 p-0 text-left shadow-lg backdrop-blur transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5"
-              >
-                <CardContent className="space-y-3 p-5">
-                  <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary">
-                    <feature.icon className="h-4 w-4" />
-                  </div>
-                  <h3 className="text-base font-semibold text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {feature.description}
+            <div className="grid gap-4 sm:grid-cols-2">
+              {highlightFeatures.map(feature => (
+                <Card
+                  key={feature.title}
+                  className="border border-white/20 bg-white/60 p-0 text-left shadow-lg backdrop-blur transition-transform duration-300 ease-out hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5"
+                >
+                  <CardContent className="space-y-3 p-5">
+                    <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary">
+                      <feature.icon className="h-4 w-4" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {feature.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            <div className="grid gap-6 rounded-2xl border border-white/20 bg-white/50 p-6 text-sm text-muted-foreground backdrop-blur dark:border-white/10 dark:bg-white/5 sm:grid-cols-3 sm:text-base">
+              {trustMetrics.map(metric => (
+                <div key={metric.label} className="space-y-1">
+                  <p className="text-2xl font-semibold text-foreground sm:text-3xl">
+                    {metric.value}
                   </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  <p>{metric.label}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-          <div className="grid gap-6 rounded-2xl border border-white/20 bg-white/50 p-6 text-sm text-muted-foreground backdrop-blur dark:border-white/10 dark:bg-white/5 sm:grid-cols-3 sm:text-base">
-            {trustMetrics.map(metric => (
-              <div key={metric.label} className="space-y-1">
-                <p className="text-2xl font-semibold text-foreground sm:text-3xl">
-                  {metric.value}
-                </p>
-                <p>{metric.label}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="lg:pl-4">
+        <section className={cn('w-full lg:pl-4', isCompact && 'max-w-lg')}>
+          {isCompact && (
+            <div className="mb-6 space-y-2 text-center">
+              <h1 className="text-3xl font-semibold tracking-tight">
+                Sign in to continue
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                You need to sign in before accessing this page.
+              </p>
+            </div>
+          )}
           <Card className="border border-white/30 bg-background/80 shadow-2xl backdrop-blur">
             <CardHeader className="space-y-3">
               <Badge

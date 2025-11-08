@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 
 import { db } from '@/app/db';
 import { verificationTokens } from '@/app/db/schema';
+import { eq } from 'drizzle-orm';
+import { z } from 'zod';
+
 import {
   generateOtpCode,
   getOtpExpiry,
@@ -11,7 +13,6 @@ import {
   maskPhoneFromFull,
   normalizePhoneNumber,
 } from '@/lib/phone-auth';
-import { eq } from 'drizzle-orm';
 
 const requestSchema = z.object({
   phone: z.string().min(6, 'Phone number is required'),
@@ -37,7 +38,9 @@ export async function POST(req: Request) {
       normalizedPhone = normalizePhoneNumber(parsed.data.phone);
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : 'Invalid phone number provided.';
+        error instanceof Error
+          ? error.message
+          : 'Invalid phone number provided.';
       return NextResponse.json(
         {
           success: false,
@@ -51,7 +54,9 @@ export async function POST(req: Request) {
     const hashedOtp = hashOtpCode(otpCode);
     const expiresAt = getOtpExpiry();
 
-    await db.delete(verificationTokens).where(eq(verificationTokens.identifier, phoneHash));
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.identifier, phoneHash));
 
     await db.insert(verificationTokens).values({
       identifier: phoneHash,

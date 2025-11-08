@@ -5,7 +5,9 @@ const OTP_TTL_MS = 5 * 60 * 1000; // 5 minutes
 function requireSecret(envKey: string): string {
   const secret = process.env[envKey];
   if (!secret) {
-    throw new Error(`${envKey} environment variable is required for phone authentication`);
+    throw new Error(
+      `${envKey} environment variable is required for phone authentication`
+    );
   }
   return secret;
 }
@@ -22,7 +24,10 @@ export function normalizePhoneNumber(rawPhone: string): string {
 
 export function hashPhoneNumber(normalizedPhone: string): string {
   const secret = requireSecret('PHONE_NUMBER_SECRET');
-  return crypto.createHmac('sha256', secret).update(normalizedPhone).digest('hex');
+  return crypto
+    .createHmac('sha256', secret)
+    .update(normalizedPhone)
+    .digest('hex');
 }
 
 export function generateOtpCode(): string {

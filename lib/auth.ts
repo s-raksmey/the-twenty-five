@@ -1,6 +1,13 @@
-import crypto from 'crypto';
 import { db } from '@/app/db';
 import { users, verificationTokens } from '@/app/db/schema';
+import crypto from 'crypto';
+import { and, eq } from 'drizzle-orm';
+import { type NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
+import nodemailer from 'nodemailer';
+import { z } from 'zod';
+
 import { TursoDrizzleAdapter } from '@/lib/auth-adapter';
 import { EmailValidator } from '@/lib/email-validator';
 import {
@@ -9,12 +16,6 @@ import {
   maskPhoneFromLastFour,
   normalizePhoneNumber,
 } from '@/lib/phone-auth';
-import { and, eq } from 'drizzle-orm';
-import { type NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import nodemailer from 'nodemailer';
-import { z } from 'zod';
 
 // ----- Types -----
 interface GoogleProfile {
@@ -47,7 +48,9 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         const parsed = phoneCredentialsSchema.safeParse(credentials);
         if (!parsed.success) {
-          throw new Error('Please provide a valid phone number and verification code.');
+          throw new Error(
+            'Please provide a valid phone number and verification code.'
+          );
         }
 
         const normalizedPhone = normalizePhoneNumber(parsed.data.phone);
@@ -75,11 +78,15 @@ export const authOptions: NextAuthOptions = {
           await db
             .delete(verificationTokens)
             .where(eq(verificationTokens.identifier, phoneHash));
-          throw new Error('Your verification code has expired. Please request a new one.');
+          throw new Error(
+            'Your verification code has expired. Please request a new one.'
+          );
         }
 
         // Delete token after use
-        await db.delete(verificationTokens).where(eq(verificationTokens.identifier, phoneHash));
+        await db
+          .delete(verificationTokens)
+          .where(eq(verificationTokens.identifier, phoneHash));
 
         const lastFour = normalizedPhone.slice(-4);
 
@@ -89,9 +96,8 @@ export const authOptions: NextAuthOptions = {
           .where(eq(users.phoneNumberHash, phoneHash))
           .limit(1);
 
-        let userRecord:
-          | (typeof existingUser)[number]
-          | undefined = existingUser.length > 0 ? existingUser[0] : undefined;
+        let userRecord: (typeof existingUser)[number] | undefined =
+          existingUser.length > 0 ? existingUser[0] : undefined;
 
         if (!userRecord) {
           const createdUsers = await db

@@ -1,34 +1,42 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Mail, Phone, Sparkles } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { PhoneOtpForm } from "@/components/auth/phone-otp-form"
-import { GoogleSignIn } from "@/components/auth/google-sign-in"
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
+import { useState } from 'react';
+
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Mail, Phone, Sparkles } from 'lucide-react';
+
+import { GoogleSignIn } from '@/components/auth/google-sign-in';
+import { PhoneOtpForm } from '@/components/auth/phone-otp-form';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 export function SignInDialog({
   open,
   onOpenChange,
 }: {
-  open: boolean
-  onOpenChange: (v: boolean) => void
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null)
-  const reset = () => setSelected(null)
+  const [selected, setSelected] = useState<string | null>(null);
+  const reset = () => setSelected(null);
   const handleSuccess = () => {
-    onOpenChange(false)
-    reset()
-  }
+    onOpenChange(false);
+    reset();
+  };
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(o) => {
-        onOpenChange(o)
-        if (!o) reset()
+      onOpenChange={o => {
+        onOpenChange(o);
+        if (!o) reset();
       }}
     >
       <DialogTrigger asChild>
@@ -41,7 +49,7 @@ export function SignInDialog({
             <motion.div
               whileHover={{ rotate: 12, scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
-              transition={{ type: "spring", stiffness: 500, damping: 15 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 15 }}
               className="rounded-full bg-white/20 p-1 shadow-inner"
             >
               <Sparkles className="h-4 w-4" />
@@ -81,7 +89,7 @@ export function SignInDialog({
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{
-                    type: "spring",
+                    type: 'spring',
                     stiffness: 500,
                     damping: 40,
                     duration: 0.1,
@@ -94,9 +102,12 @@ export function SignInDialog({
                     transition={{ delay: 0.05, duration: 0.2 }}
                     className="text-center"
                   >
-                    <h2 className="text-xl font-bold tracking-tight text-foreground">Choose your sign-in method</h2>
+                    <h2 className="text-xl font-bold tracking-tight text-foreground">
+                      Choose your sign-in method
+                    </h2>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      Pick the option that fits you best. You can switch between providers anytime.
+                      Pick the option that fits you best. You can switch between
+                      providers anytime.
                     </p>
                   </motion.div>
 
@@ -109,7 +120,7 @@ export function SignInDialog({
                       <Button
                         variant="outline"
                         className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border/60 bg-gradient-to-r from-white via-slate-50 to-white text-base font-semibold text-slate-900 shadow-[0_18px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_25px_45px_-25px_rgba(79,70,229,0.55)] dark:from-neutral-100 dark:via-white dark:to-neutral-100 dark:text-slate-900"
-                        onClick={() => setSelected("google")}
+                        onClick={() => setSelected('google')}
                       >
                         <Mail className="h-5 w-5 text-[#4285F4]" />
                         <span>Continue with Google</span>
@@ -124,7 +135,7 @@ export function SignInDialog({
                       <Button
                         variant="outline"
                         className="flex w-full items-center justify-center gap-3 rounded-2xl border border-transparent bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-600 text-base font-semibold text-white shadow-[0_20px_45px_-25px_rgba(56,189,248,0.9)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_30px_55px_-25px_rgba(129,140,248,0.85)]"
-                        onClick={() => setSelected("phone")}
+                        onClick={() => setSelected('phone')}
                       >
                         <Phone className="h-5 w-5" />
                         <span>Sign in with Phone</span>
@@ -132,14 +143,14 @@ export function SignInDialog({
                     </motion.div>
                   </div>
                 </motion.div>
-              ) : selected === "phone" ? (
+              ) : selected === 'phone' ? (
                 <motion.div
                   key="phone"
                   initial={{ opacity: 0, x: 15 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -15 }}
                   transition={{
-                    type: "spring",
+                    type: 'spring',
                     stiffness: 500,
                     damping: 40,
                     duration: 0.1,
@@ -154,7 +165,7 @@ export function SignInDialog({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -15 }}
                   transition={{
-                    type: "spring",
+                    type: 'spring',
                     stiffness: 500,
                     damping: 40,
                     duration: 0.1,
@@ -168,5 +179,5 @@ export function SignInDialog({
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

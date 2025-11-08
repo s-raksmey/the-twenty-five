@@ -1,88 +1,115 @@
-"use client"
+'use client';
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { ArrowLeft, RotateCcw, Shield, Sparkle, TimerReset } from "lucide-react"
-import { signIn } from "next-auth/react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import { Label } from "@/components/ui/label"
-import { PhoneInput } from "@/components/ui/phone-input"
+import { useEffect, useState } from 'react';
+
+import { motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  RotateCcw,
+  Shield,
+  Sparkle,
+  TimerReset,
+} from 'lucide-react';
+import { signIn } from 'next-auth/react';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
+import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 interface PhoneOtpFormProps {
-  onBack: () => void
-  onSuccess?: () => void
+  onBack: () => void;
+  onSuccess?: () => void;
 }
 
-const RESEND_COOLDOWN = 60
+const RESEND_COOLDOWN = 60;
 
 export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
-  const [phone, setPhone] = useState<string>("")
-  const [code, setCode] = useState("")
-  const [otpSent, setOtpSent] = useState(false)
-  const [maskedPhone, setMaskedPhone] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [cooldown, setCooldown] = useState(0)
-  const [alert, setAlert] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const [phone, setPhone] = useState<string>('');
+  const [code, setCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [maskedPhone, setMaskedPhone] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const [alert, setAlert] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
   // Cooldown countdown
   useEffect(() => {
-    if (cooldown <= 0) return
-    const t = setInterval(() => setCooldown((c) => (c > 0 ? c - 1 : 0)), 1000)
-    return () => clearInterval(t)
-  }, [cooldown])
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown(c => (c > 0 ? c - 1 : 0)), 1000);
+    return () => clearInterval(t);
+  }, [cooldown]);
 
   const handleSendOtp = async () => {
-    if (!phone?.trim()) return
-    setLoading(true)
-    setAlert(null)
+    if (!phone?.trim()) return;
+    setLoading(true);
+    setAlert(null);
 
     try {
-      const res = await fetch("/api/auth/phone/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/auth/phone/request-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone }),
-      })
-      const data = await res.json()
+      });
+      const data = await res.json();
 
       if (data.success) {
-        setOtpSent(true)
-        setMaskedPhone(data.maskedPhone ?? null)
-        setCooldown(RESEND_COOLDOWN)
-        setAlert({ type: "success", message: `Verification code sent to ${data.maskedPhone}` })
+        setOtpSent(true);
+        setMaskedPhone(data.maskedPhone ?? null);
+        setCooldown(RESEND_COOLDOWN);
+        setAlert({
+          type: 'success',
+          message: `Verification code sent to ${data.maskedPhone}`,
+        });
       } else {
-        setAlert({ type: "error", message: data.message || "Failed to send verification code." })
+        setAlert({
+          type: 'error',
+          message: data.message || 'Failed to send verification code.',
+        });
       }
     } catch {
-      setAlert({ type: "error", message: "Something went wrong. Please try again." })
+      setAlert({
+        type: 'error',
+        message: 'Something went wrong. Please try again.',
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyCode = async () => {
-    if (code.trim().length < 6) return
-    setLoading(true)
-    setAlert(null)
+    if (code.trim().length < 6) return;
+    setLoading(true);
+    setAlert(null);
 
-    const result = await signIn("phone", { phone, code, redirect: false })
+    const result = await signIn('phone', { phone, code, redirect: false });
 
     if (result?.error) {
-      setAlert({ type: "error", message: result.error })
+      setAlert({ type: 'error', message: result.error });
     } else {
-      setAlert({ type: "success", message: "🎉 Welcome back! Sign in successful." })
-      setTimeout(() => onSuccess?.(), 600)
+      setAlert({
+        type: 'success',
+        message: '🎉 Welcome back! Sign in successful.',
+      });
+      setTimeout(() => onSuccess?.(), 600);
     }
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const handleResendOtp = () => {
-    if (cooldown > 0) return
-    setCode("")
-    setOtpSent(false)
-    setAlert(null)
-  }
+    if (cooldown > 0) return;
+    setCode('');
+    setOtpSent(false);
+    setAlert(null);
+  };
 
   return (
     <motion.div
@@ -98,19 +125,24 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
           Seamless phone access
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-foreground">Verify with your phone</h3>
+          <h3 className="text-xl font-bold text-foreground">
+            Verify with your phone
+          </h3>
           <p className="text-sm text-muted-foreground">
             {!otpSent
               ? "Enter your phone number and we'll send you a secure code."
-              : `Enter the 6-digit code sent to ${maskedPhone ?? "your phone number"}.`}
+              : `Enter the 6-digit code sent to ${maskedPhone ?? 'your phone number'}.`}
           </p>
         </div>
       </div>
 
       {/* Alerts */}
       {alert && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-          <Alert variant={alert.type === "error" ? "destructive" : "default"}>
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Alert variant={alert.type === 'error' ? 'destructive' : 'default'}>
             <AlertDescription>{alert.message}</AlertDescription>
           </Alert>
         </motion.div>
@@ -121,7 +153,9 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         {!otpSent ? (
           <>
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-foreground">Phone number</Label>
+              <Label className="text-sm font-semibold text-foreground">
+                Phone number
+              </Label>
               <PhoneInput
                 value={phone}
                 onChange={(value: string) => setPhone(value)}
@@ -142,7 +176,11 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
               {loading ? (
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                   className="h-5 w-5 rounded-full border-2 border-white border-t-transparent"
                 />
               ) : (
@@ -153,7 +191,9 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         ) : (
           <>
             <div className="space-y-3">
-              <Label className="text-sm font-semibold text-foreground">Verification code</Label>
+              <Label className="text-sm font-semibold text-foreground">
+                Verification code
+              </Label>
               <InputOTP
                 maxLength={6}
                 value={code}
@@ -161,7 +201,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
                 containerClassName="justify-center"
               >
                 <InputOTPGroup>
-                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                  {[0, 1, 2, 3, 4, 5].map(i => (
                     <InputOTPSlot key={i} index={i} />
                   ))}
                 </InputOTPGroup>
@@ -176,7 +216,11 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
               {loading ? (
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+                  transition={{
+                    duration: 0.8,
+                    repeat: Infinity,
+                    ease: 'linear',
+                  }}
                   className="h-5 w-5 rounded-full border-2 border-white border-t-transparent"
                 />
               ) : (
@@ -191,7 +235,9 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
               </div>
               <div className="flex items-center gap-2 text-foreground">
                 <TimerReset className="h-4 w-4 text-primary" />
-                <span>{cooldown > 0 ? `Resend in ${cooldown}s` : "You can resend"}</span>
+                <span>
+                  {cooldown > 0 ? `Resend in ${cooldown}s` : 'You can resend'}
+                </span>
               </div>
             </div>
 
@@ -220,5 +266,5 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         Back
       </Button>
     </motion.div>
-  )
+  );
 }

@@ -1,4 +1,3 @@
-// components/marketing/home-page-content.tsx
 'use client';
 
 import { ArrowRight, Sparkles, Users, Zap } from 'lucide-react';
@@ -40,7 +39,8 @@ export default function HomePageContent() {
               Why Choose <span className="gradient-text">MyApp</span>?
             </h2>
             <p className="mt-3 sm:mt-4 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              Experience the future of productivity with our innovative platform designed for modern teams and individuals.
+              Experience the future of productivity with our innovative platform
+              designed for modern teams and individuals.
             </p>
           </div>
 
@@ -76,9 +76,13 @@ export default function HomePageContent() {
                 Ready to Get Started?
               </h2>
               <p className="text-base sm:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto px-4 sm:px-0">
-                Join thousands of users who are already transforming their workflow with our platform.
+                Join thousands of users who are already transforming their
+                workflow with our platform.
               </p>
-              <Button size="lg" className="gap-2 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg">
+              <Button
+                size="lg"
+                className="gap-2 px-6 sm:px-8 py-5 sm:py-6 text-base sm:text-lg"
+              >
                 Get Started Free
                 <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>

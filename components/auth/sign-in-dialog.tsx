@@ -5,8 +5,8 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Mail, Phone, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { PhoneOtpForm } from "@/components/authentication/PhoneOtpForm"
-import { GoogleSignIn } from "@/components/authentication/GoogleSignIn"
+import { PhoneOtpForm } from "@/components/auth/phone-otp-form"
+import { GoogleSignIn } from "@/components/auth/google-sign-in"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 
 export function SignInDialog({

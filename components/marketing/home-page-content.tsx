@@ -1,13 +1,13 @@
-// components/Home.tsx
+// components/marketing/home-page-content.tsx
 'use client';
 
 import { ArrowRight, Sparkles, Users, Zap } from 'lucide-react';
 
-import HeroSection from '@/components/HeroSection';
+import HeroSection from '@/components/marketing/hero-section';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-export default function Home() {
+export default function HomePageContent() {
   const features = [
     {
       icon: <Sparkles className="w-5 h-5 sm:w-6 sm:h-6" />,

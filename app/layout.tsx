@@ -1,9 +1,9 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
 
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
-import ThemeToggle from '@/components/ThemeToggle';
+import Footer from '@/components/layout/footer';
+import Navbar from '@/components/layout/navbar';
+import ThemeToggle from '@/components/layout/theme-toggle';
 
 import './globals.css';
 import { Providers } from './providers';

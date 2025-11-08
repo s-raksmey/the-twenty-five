@@ -16,7 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SignInDialog } from "@/components/authentication/SignInDialog"
+import { SignInDialog } from "@/components/auth/sign-in-dialog"
 
 const navContainer: Variants = {
   hidden: {},

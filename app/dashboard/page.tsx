@@ -1,7 +1,9 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
 import { getServerSession } from 'next-auth';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { authOptions } from '@/lib/auth';
@@ -10,7 +12,9 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/auth/signin');
+    redirect(
+      `/auth/signin?mode=compact&callbackUrl=${encodeURIComponent('/dashboard')}`
+    );
   }
 
   return (
@@ -24,6 +28,11 @@ export default async function DashboardPage() {
             Explore the dashboard to keep your commitments, celebrate wins, and
             stay aligned with your team.
           </p>
+          <div className="mt-6">
+            <Button asChild size="lg">
+              <Link href="/">Go to home</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">

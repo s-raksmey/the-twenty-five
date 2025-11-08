@@ -11,15 +11,21 @@ declare module 'next-auth' {
       phoneLogin?: boolean | undefined;
       phoneMasked?: string | undefined;
       phoneLast4?: string | undefined;
+      needsEmailVerification?: boolean | undefined;
+      verificationToken?: string | undefined;
+      verificationTokenExpires?: Date | undefined;
     } & DefaultSession['user'];
   }
 
   interface User {
-    emailVerified?: boolean;
+    emailVerified?: boolean | Date | null;
     isLikelyFake?: boolean;
     phoneLogin?: boolean;
     phoneMasked?: string;
     phoneLast4?: string;
+    needsEmailVerification?: boolean;
+    verificationToken?: string | null;
+    verificationTokenExpires?: Date | null;
   }
 
   interface Profile {
@@ -28,6 +34,10 @@ declare module 'next-auth' {
     name?: string;
     picture?: string;
     sub?: string;
+  }
+
+  interface Account {
+    access_token?: string;
   }
 }
 
@@ -39,5 +49,9 @@ declare module 'next-auth/jwt' {
     phoneLogin?: boolean | undefined;
     phoneMasked?: string | undefined;
     phoneLast4?: string | undefined;
+    needsEmailVerification?: boolean | undefined;
+    verificationToken?: string | undefined;
+    verificationTokenExpires?: Date | undefined;
+    sub?: string;
   }
 }

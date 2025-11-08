@@ -9,6 +9,10 @@ export const users = sqliteTable('users', {
   image: text('image'),
   phoneNumberHash: text('phoneNumberHash').unique(),
   phoneNumberLast4: text('phoneNumberLast4'),
+  verificationToken: text('verificationToken'),
+  verificationTokenExpires: integer('verificationTokenExpires', {
+    mode: 'timestamp',
+  }),
 });
 
 export const accounts = sqliteTable('accounts', {

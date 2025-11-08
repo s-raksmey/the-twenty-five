@@ -149,7 +149,7 @@ export const authOptions: NextAuthOptions = {
           id: userRecord.id,
           name: userRecord.name ?? `Phone ${storedLastFour}`,
           email: userRecord.email ?? undefined,
-          emailVerified: userRecord.emailVerified,
+          emailVerified: true,
           phoneMasked: masked,
           phoneLast4: storedLastFour,
           phoneLogin: true,
@@ -166,7 +166,6 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/auth/signin',
-    verifyRequest: '/auth/verify-email',
   },
 
   // ----- Callbacks -----
@@ -192,74 +191,48 @@ export const authOptions: NextAuthOptions = {
 
         const isFirstLogin = existingUser.length === 0;
 
-        if (isFirstLogin) {
-          // New user - create account with verification token
-          const verificationToken =
-            EmailVerificationService.generateVerificationToken();
-          const verificationExpiry =
-            EmailVerificationService.getVerificationExpiry();
+        const now = new Date();
 
+        if (isFirstLogin) {
           await db.insert(users).values({
             id: crypto.randomUUID(),
             email: email,
             name: user.name,
             image: user.image,
-            emailVerified: null,
-            verificationToken,
-            verificationTokenExpires: verificationExpiry,
+            emailVerified: now,
+            verificationToken: null,
+            verificationTokenExpires: null,
           });
-
-          // Send verification email
-          await EmailVerificationService.sendVerificationEmail(
-            email,
-            verificationToken,
-            user.name
-          );
         } else {
-          // Existing user
           const userRecord = existingUser[0] as UserRecord;
 
-          if (!userRecord.emailVerified) {
-            // User exists but email is not verified
-            // Check if they have a valid verification token
-            const now = new Date();
-            const hasValidToken =
-              userRecord.verificationToken &&
-              userRecord.verificationTokenExpires &&
-              userRecord.verificationTokenExpires > now;
+          await db
+            .update(users)
+            .set({
+              emailVerified: userRecord.emailVerified ?? now,
+              verificationToken: null,
+              verificationTokenExpires: null,
+            })
+            .where(eq(users.id, userRecord.id));
 
-            if (!hasValidToken) {
-              // Generate new verification token
-              const verificationToken =
-                EmailVerificationService.generateVerificationToken();
-              const verificationExpiry =
-                EmailVerificationService.getVerificationExpiry();
+          try {
+            await EmailVerificationService.sendLoginNotification(
+              email,
+              userRecord.name
+            );
+          } catch (err) {
+            console.error('⚠️ Failed to send login notification:', err);
+          }
+        }
 
-              await db
-                .update(users)
-                .set({
-                  verificationToken,
-                  verificationTokenExpires: verificationExpiry,
-                })
-                .where(eq(users.id, userRecord.id));
-
-              await EmailVerificationService.sendVerificationEmail(
-                email,
-                verificationToken,
-                userRecord.name
-              );
-            }
-            // If valid token exists, no need to resend
-          } else {
-            // User is verified - send login notification
-            try {
-              await EmailVerificationService.sendLoginNotification(
-                email,
-                userRecord.name
-              );
-            } catch (err) {
-              console.error('⚠️ Failed to send login notification:', err);
-            }
+        if (isFirstLogin) {
+          try {
+            await EmailVerificationService.sendLoginNotification(
+              email,
+              user.name
+            );
+          } catch (err) {
+            console.error('⚠️ Failed to send login notification:', err);
           }
         }
 
@@ -270,7 +243,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
 
-    async jwt({ token, account, profile, user, trigger, session }) {
+    async jwt({ token, account, profile: _profile, user, trigger, session }) {
       // Initial sign in
       if (account && user) {
         if (account.access_token) {
@@ -278,36 +251,15 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (account.provider === 'google') {
-          const googleProfile = profile as GoogleProfile;
-          token.emailVerified = googleProfile?.email_verified || false;
+          token.emailVerified = true;
           token.isLikelyFake = EmailValidator.isLikelyFake(token.email || '');
           token.phoneLogin = false;
-
-          // Check verification status in database for Google users
-          if (token.email) {
-            const existingUser = await db
-              .select()
-              .from(users)
-              .where(eq(users.email, token.email))
-              .limit(1);
-
-            if (existingUser.length > 0) {
-              const userRecord = existingUser[0] as UserRecord;
-              token.emailVerified = Boolean(userRecord.emailVerified);
-              token.needsEmailVerification = !userRecord.emailVerified;
-              token.verificationToken =
-                userRecord.verificationToken || undefined;
-              token.verificationTokenExpires =
-                userRecord.verificationTokenExpires || undefined;
-            }
-          }
         }
 
         if (account.provider === 'credentials') {
           token.phoneLogin = true;
           token.isLikelyFake = false;
-          token.emailVerified = false; // Phone users don't have email verification
-          token.needsEmailVerification = false;
+          token.emailVerified = true;
         }
       }
 
@@ -318,25 +270,12 @@ export const authOptions: NextAuthOptions = {
         token.phoneLogin = user.phoneLogin || false;
         token.phoneMasked = user.phoneMasked;
         token.phoneLast4 = user.phoneLast4;
-        token.needsEmailVerification = user.needsEmailVerification || false;
       }
 
-      // Update token when session is updated (e.g., after email verification)
+      // Update token when session is updated
       if (trigger === 'update' && session?.user) {
         if (typeof session.user.emailVerified !== 'undefined') {
           token.emailVerified = Boolean(session.user.emailVerified);
-
-          if (session.user.emailVerified) {
-            token.needsEmailVerification = false;
-            token.verificationToken = undefined;
-            token.verificationTokenExpires = undefined;
-          }
-        }
-
-        if (typeof session.user.needsEmailVerification !== 'undefined') {
-          token.needsEmailVerification = Boolean(
-            session.user.needsEmailVerification
-          );
         }
       }
 
@@ -352,7 +291,6 @@ export const authOptions: NextAuthOptions = {
         session.user.phoneLogin = token.phoneLogin;
         session.user.phoneMasked = token.phoneMasked;
         session.user.phoneLast4 = token.phoneLast4;
-        session.user.needsEmailVerification = token.needsEmailVerification;
       }
       return session;
     },

@@ -70,12 +70,6 @@ export default withAuth(
           return false;
         }
 
-        // Check if email is verified
-        if (!token.emailVerified) {
-          console.log('Blocked user with unverified email:', token.email);
-          return false;
-        }
-
         return true;
       },
     },

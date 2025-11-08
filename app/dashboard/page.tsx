@@ -13,10 +13,6 @@ export default async function DashboardPage() {
     redirect('/auth/signin');
   }
 
-  if (!session.user?.emailVerified) {
-    redirect('/auth/verify-email');
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 px-4 py-16">
       <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -25,8 +21,8 @@ export default async function DashboardPage() {
             Welcome back, {session.user?.name ?? 'there'}
           </h1>
           <p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Your account is fully verified. Explore the dashboard to keep your
-            commitments, celebrate wins, and stay aligned with your team.
+            Explore the dashboard to keep your commitments, celebrate wins, and
+            stay aligned with your team.
           </p>
         </div>
 
@@ -52,15 +48,7 @@ export default async function DashboardPage() {
               <CardTitle>Account status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-muted-foreground">
-              <p>
-                Email verification:{' '}
-                <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                  Complete
-                </span>
-              </p>
-              <p>
-                Signed in as {session.user?.email ?? 'your verified account'}.
-              </p>
+              <p>Signed in as {session.user?.email ?? 'your account'}.</p>
             </CardContent>
           </Card>
         </div>

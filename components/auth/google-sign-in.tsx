@@ -12,7 +12,7 @@ interface GoogleSignInProps {
 
 export function GoogleSignIn({ onBack }: GoogleSignInProps) {
   const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/' });
+    signIn('google', { callbackUrl: '/dashboard' });
   };
 
   return (

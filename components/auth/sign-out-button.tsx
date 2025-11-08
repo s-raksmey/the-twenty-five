@@ -1,8 +1,6 @@
-// components/auth/sign-out-button.tsx
 'use client';
 
 import { signOut } from 'next-auth/react';
-
 
 export default function SignOutButton() {
   return (

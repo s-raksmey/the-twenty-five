@@ -1,5 +1,6 @@
 // middleware.ts (or proxy.ts)
 import { NextResponse } from 'next/server';
+
 import { withAuth } from 'next-auth/middleware';
 
 export default withAuth(
@@ -18,7 +19,7 @@ export default withAuth(
     response.headers.set('X-Frame-Options', 'DENY');
     response.headers.set('X-Content-Type-Options', 'nosniff');
     response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-    
+
     // Fix: Allow images from Google and other trusted sources
     response.headers.set(
       'Content-Security-Policy',

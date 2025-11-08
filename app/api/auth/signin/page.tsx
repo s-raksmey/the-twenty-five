@@ -19,14 +19,16 @@ export default function SignInPage() {
   const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [otpRequested, setOtpRequested] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [statusVariant, setStatusVariant] = useState<'success' | 'error' | 'info' | null>(null);
+  const [statusVariant, setStatusVariant] = useState<
+    'success' | 'error' | 'info' | null
+  >(null);
   const [maskedPhone, setMaskedPhone] = useState('');
   const [debugCode, setDebugCode] = useState<string | null>(null);
 
   useEffect(() => {
     if (cooldown <= 0) return;
     const timer = window.setInterval(() => {
-      setCooldown((value) => (value > 0 ? value - 1 : 0));
+      setCooldown(value => (value > 0 ? value - 1 : 0));
     }, 1000);
 
     return () => window.clearInterval(timer);
@@ -130,8 +132,8 @@ export default function SignInPage() {
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              We verify every login to keep your account safe. Disposable
-              emails and unverified phone numbers are blocked.
+              We verify every login to keep your account safe. Disposable emails
+              and unverified phone numbers are blocked.
             </AlertDescription>
           </Alert>
 
@@ -149,7 +151,7 @@ export default function SignInPage() {
                 id="phone-input"
                 placeholder="e.g. +15551234567"
                 value={phone}
-                onChange={(event) => setPhone(event.target.value)}
+                onChange={event => setPhone(event.target.value)}
                 inputMode="tel"
                 autoComplete="tel"
               />
@@ -161,7 +163,9 @@ export default function SignInPage() {
 
             <Button
               onClick={handleRequestCode}
-              disabled={isRequestingCode || cooldown > 0 || phone.trim().length === 0}
+              disabled={
+                isRequestingCode || cooldown > 0 || phone.trim().length === 0
+              }
               className="w-full"
               variant="secondary"
             >
@@ -180,7 +184,7 @@ export default function SignInPage() {
                     id="otp-input"
                     placeholder="6-digit code"
                     value={code}
-                    onChange={(event) => setCode(event.target.value)}
+                    onChange={event => setCode(event.target.value)}
                     inputMode="numeric"
                     autoComplete="one-time-code"
                   />
@@ -196,7 +200,8 @@ export default function SignInPage() {
 
                 {showDebugCode && (
                   <p className="text-xs text-muted-foreground">
-                    Development code for {maskedPhone}: <strong>{debugCode}</strong>
+                    Development code for {maskedPhone}:{' '}
+                    <strong>{debugCode}</strong>
                   </p>
                 )}
               </div>

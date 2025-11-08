@@ -1,18 +1,19 @@
-"use client"
+'use client';
 
-import { motion } from "framer-motion"
-import { ArrowLeft, CheckCircle, Mail, Shield } from "lucide-react"
-import { signIn } from "next-auth/react"
-import { Button } from "@/components/ui/button"
+import { motion } from 'framer-motion';
+import { ArrowLeft, CheckCircle, Mail, Shield } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+
+import { Button } from '@/components/ui/button';
 
 interface GoogleSignInProps {
-  onBack: () => void
+  onBack: () => void;
 }
 
 export function GoogleSignIn({ onBack }: GoogleSignInProps) {
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/" })
-  }
+    signIn('google', { callbackUrl: '/' });
+  };
 
   return (
     <motion.div
@@ -27,7 +28,9 @@ export function GoogleSignIn({ onBack }: GoogleSignInProps) {
           One-click access
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-foreground">Continue with Google</h3>
+          <h3 className="text-xl font-bold text-foreground">
+            Continue with Google
+          </h3>
           <p className="text-sm text-muted-foreground">
             Sign in instantly using your Google account. Secure and fast.
           </p>
@@ -65,5 +68,5 @@ export function GoogleSignIn({ onBack }: GoogleSignInProps) {
         Back
       </Button>
     </motion.div>
-  )
+  );
 }

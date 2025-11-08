@@ -1,4 +1,3 @@
-// components/marketing/hero-section.tsx
 'use client';
 
 import { motion } from 'framer-motion';

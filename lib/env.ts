@@ -12,11 +12,11 @@ export const env = {
 export function validateEnv() {
   const required = [
     'GOOGLE_CLIENT_ID',
-    'GOOGLE_CLIENT_SECRET', 
+    'GOOGLE_CLIENT_SECRET',
     'NEXTAUTH_SECRET',
     'NEXTAUTH_URL',
     'TURSO_CONNECTION_URL',
-    'TURSO_AUTH_TOKEN'
+    'TURSO_AUTH_TOKEN',
   ];
 
   for (const key of required) {

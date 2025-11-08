@@ -24,10 +24,10 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 Phone-based authentication relies on two secrets to protect user data:
 
-| Variable | Description |
-| --- | --- |
+| Variable              | Description                                                            |
+| --------------------- | ---------------------------------------------------------------------- |
 | `PHONE_NUMBER_SECRET` | Secret used to hash phone numbers before storing them in the database. |
-| `OTP_SECRET` | Secret used to hash one-time passcodes before persisting them. |
+| `OTP_SECRET`          | Secret used to hash one-time passcodes before persisting them.         |
 
 Add both keys to your `.env.local` file before requesting OTP codes. Use long, random strings.
 

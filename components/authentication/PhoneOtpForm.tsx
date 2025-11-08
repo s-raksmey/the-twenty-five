@@ -92,14 +92,14 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
       className="space-y-5"
     >
       {/* Header */}
-      <div className="space-y-3 text-left">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white border border-white/30">
+      <div className="space-y-4 text-left">
+        <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-primary dark:border-white/15 dark:bg-white/10 dark:text-white/90">
           <Sparkle className="h-3 w-3" />
           Seamless phone access
         </div>
         <div className="space-y-2">
-          <h3 className="text-xl font-bold text-white">Verify with your phone</h3>
-          <p className="text-sm text-gray-300">
+          <h3 className="text-xl font-bold text-foreground">Verify with your phone</h3>
+          <p className="text-sm text-muted-foreground">
             {!otpSent
               ? "Enter your phone number and we'll send you a secure code."
               : `Enter the 6-digit code sent to ${maskedPhone ?? "your phone number"}.`}
@@ -121,29 +121,29 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         {!otpSent ? (
           <>
             <div className="space-y-2">
-              <Label className="text-sm font-semibold text-gray-200">Phone number</Label>
+              <Label className="text-sm font-semibold text-foreground">Phone number</Label>
               <PhoneInput
                 value={phone}
                 onChange={(value: string) => setPhone(value)}
                 placeholder="Enter phone number"
                 defaultCountry="KH"
-                className="bg-slate-900/50 border-white/20 focus-within:border-white/40"
+                className="border border-border/60 bg-white/50 text-foreground backdrop-blur-sm focus-within:border-primary/60 focus-within:ring-1 focus-within:ring-primary/30 dark:border-white/20 dark:bg-slate-900/60"
               />
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-muted-foreground">
                 We&apos;ll send a verification code to this number.
               </p>
             </div>
 
             <Button
               onClick={handleSendOtp}
-              className="w-full h-11 bg-white text-black hover:bg-gray-100 font-semibold transition-all active:scale-95"
+              className="h-11 w-full rounded-2xl bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-600 text-base font-semibold text-white shadow-[0_20px_45px_-25px_rgba(56,189,248,0.9)] transition-all duration-200 hover:scale-[1.01] hover:shadow-[0_30px_55px_-25px_rgba(129,140,248,0.85)] active:scale-95"
               disabled={loading || !phone}
             >
               {loading ? (
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
+                  className="h-5 w-5 rounded-full border-2 border-white border-t-transparent"
                 />
               ) : (
                 <>Send Verification Code</>
@@ -153,7 +153,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
         ) : (
           <>
             <div className="space-y-3">
-              <Label className="text-sm font-semibold text-gray-200">Verification code</Label>
+              <Label className="text-sm font-semibold text-foreground">Verification code</Label>
               <InputOTP
                 maxLength={6}
                 value={code}
@@ -170,27 +170,27 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
 
             <Button
               onClick={handleVerifyCode}
-              className="w-full h-11 bg-white text-black hover:bg-gray-100 font-semibold transition-all active:scale-95"
+              className="h-11 w-full rounded-2xl bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-600 text-base font-semibold text-white shadow-[0_20px_45px_-25px_rgba(56,189,248,0.9)] transition-all duration-200 hover:scale-[1.01] hover:shadow-[0_30px_55px_-25px_rgba(129,140,248,0.85)] active:scale-95"
               disabled={loading || code.length < 6}
             >
               {loading ? (
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                  className="w-5 h-5 border-2 border-black border-t-transparent rounded-full"
+                  className="h-5 w-5 rounded-full border-2 border-white border-t-transparent"
                 />
               ) : (
                 <>Verify & Sign In</>
               )}
             </Button>
 
-            <div className="flex flex-col gap-2 rounded-lg border border-white/10 bg-white/5 p-3 text-xs text-gray-300 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-white" />
+            <div className="flex flex-col gap-2 rounded-xl border border-border/60 bg-white/40 p-3 text-xs text-muted-foreground backdrop-blur-md dark:border-white/15 dark:bg-white/5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-2 text-foreground">
+                <Shield className="h-4 w-4 text-primary" />
                 <span>Your number is protected and never shared.</span>
               </div>
-              <div className="flex items-center gap-2">
-                <TimerReset className="h-4 w-4 text-white" />
+              <div className="flex items-center gap-2 text-foreground">
+                <TimerReset className="h-4 w-4 text-primary" />
                 <span>{cooldown > 0 ? `Resend in ${cooldown}s` : "You can resend"}</span>
               </div>
             </div>
@@ -201,7 +201,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
                 size="sm"
                 onClick={handleResendOtp}
                 disabled={loading || cooldown > 0}
-                className="gap-2 text-gray-400 hover:text-white hover:bg-white/5"
+                className="gap-2 rounded-full text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
               >
                 <RotateCcw className="h-4 w-4" />
                 Resend code
@@ -214,7 +214,7 @@ export function PhoneOtpForm({ onBack, onSuccess }: PhoneOtpFormProps) {
       <Button
         variant="ghost"
         onClick={onBack}
-        className="group inline-flex w-auto items-center gap-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-md transition-colors mt-2"
+        className="group mt-2 inline-flex w-auto items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
         Back

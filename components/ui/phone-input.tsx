@@ -54,7 +54,7 @@ const InputField = React.forwardRef<HTMLInputElement, React.ComponentPropsWithou
     <input
       ref={ref}
       className={cn(
-        'flex-1 bg-transparent text-base font-medium text-white placeholder:text-slate-500 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60',
+        'flex-1 bg-transparent text-base font-medium text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60',
         className,
       )}
       {...props}
@@ -102,9 +102,9 @@ const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySe
             variant="ghost"
             size="sm"
             className={cn(
-              'flex h-10 min-w-[120px] items-center justify-between gap-2 rounded-lg border border-primary/40 bg-slate-900/70 px-2.5 text-sm text-white transition-all duration-200',
-              'hover:bg-slate-800 hover:border-primary/60 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)]',
-              disabled && 'opacity-50 cursor-not-allowed',
+              'flex h-10 min-w-[120px] items-center justify-between gap-2 rounded-xl border border-border/60 bg-white/60 px-2.5 text-sm text-foreground transition-all duration-200 backdrop-blur-sm dark:border-white/20 dark:bg-slate-900/60',
+              'hover:border-primary/60 hover:bg-primary/10 hover:text-foreground hover:shadow-[0_0_12px_rgba(99,102,241,0.25)]',
+              disabled && 'cursor-not-allowed opacity-50',
             )}
           >
             <div className="flex items-center gap-2">
@@ -113,16 +113,16 @@ const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySe
                   <SelectedIcon key={selected?.value} title={selectedLabel} />
                 </span>
               ) : (
-                <Globe className="h-4 w-4 text-primary/70" />
+                <Globe className="h-4 w-4 text-primary" />
               )}
-              <span className="text-xs uppercase tracking-wide text-slate-100 truncate max-w-[60px]">
+              <span className="max-w-[60px] truncate text-xs uppercase tracking-wide">
                 {selectedLabel}
               </span>
             </div>
             {selectedCode && (
-              <span className="text-xs text-primary/80 whitespace-nowrap">+{selectedCode}</span>
+              <span className="whitespace-nowrap text-xs text-primary">+{selectedCode}</span>
             )}
-            <ChevronsUpDown className="h-4 w-4 text-slate-400 shrink-0" />
+            <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
           </Button>
         </PopoverTrigger>
 
@@ -131,20 +131,20 @@ const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySe
           side="bottom"
           sideOffset={6}
           avoidCollisions={false}
-          className="w-[260px] border border-slate-700 bg-slate-900 text-white rounded-md shadow-xl overflow-hidden"
+          className="w-[260px] overflow-hidden rounded-xl border border-border/60 bg-background/95 text-foreground shadow-xl backdrop-blur-lg dark:border-white/20"
         >
           <Command className="w-full">
-            <div className="p-2 border-b border-slate-700">
+            <div className="border-b border-border/60 p-2">
               <CommandInput
                 placeholder="Search country..."
-                className="text-sm text-white border border-slate-700 rounded-md px-3 py-1.5 bg-slate-800 focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="rounded-md border border-border/60 bg-transparent px-3 py-1.5 text-sm text-foreground focus-visible:ring-2 focus-visible:ring-primary/40"
               />
             </div>
 
             {/* FIXED: Allow scrolling anywhere inside the list */}
-            <div className="max-h-[240px] overflow-auto scroll-smooth touch-pan-y px-1 py-1 pointer-events-auto">
+            <div className="pointer-events-auto max-h-[240px] overflow-auto scroll-smooth px-1 py-1">
               <CommandList className="overflow-visible">
-                <CommandEmpty className="py-4 text-center text-sm text-slate-400">
+                <CommandEmpty className="py-4 text-center text-sm text-muted-foreground">
                   No country found.
                 </CommandEmpty>
                 <CommandGroup>
@@ -159,18 +159,18 @@ const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySe
                         value={option.label}
                         onSelect={() => handleSelect(option.value)}
                         className={cn(
-                          'flex items-center gap-2 py-1.5 px-3 rounded-md text-sm cursor-pointer transition-colors select-none',
-                          'hover:bg-slate-800 hover:text-white',
-                          isActive && 'bg-primary/25 text-primary',
+                          'flex cursor-pointer select-none items-center gap-2 rounded-md py-1.5 px-3 text-sm transition-colors',
+                          'hover:bg-primary/10 hover:text-foreground',
+                          isActive && 'bg-primary/20 text-foreground',
                         )}
                       >
                         {Icon ? (
                           <Icon title={option.label} />
                         ) : (
-                          <Globe className="h-4 w-4 text-primary/70" />
+                          <Globe className="h-4 w-4 text-primary" />
                         )}
                         <span className="flex-1 truncate">{option.label}</span>
-                        {code && <span className="text-xs text-primary/70">+{code}</span>}
+                        {code && <span className="text-xs text-primary">+{code}</span>}
                         {isActive && <Check className="h-4 w-4 text-primary" />}
                       </CommandItem>
                     )
@@ -183,7 +183,7 @@ const CountrySelect = ({ value, onChange, options, disabled, labels }: CountrySe
       </Popover>
 
       {loading && (
-        <div className="flex items-center justify-center gap-2 text-primary/80 text-xs mt-1">
+        <div className="mt-1 flex items-center justify-center gap-2 text-xs text-primary">
           <Loader2 className="h-4 w-4 animate-spin" />
           <span>Loading...</span>
         </div>
@@ -222,8 +222,7 @@ export const PhoneInput = React.forwardRef<PhoneInputElement, PhoneInputProps>(
         value={value}
         onChange={onChange}
         className={cn(
-          'flex h-11 w-full items-center gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 px-3 text-base text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-all',
-          'focus-within:border-primary focus-within:shadow-[0_0_0_2px_rgba(16,185,129,0.4)]',
+          'flex h-11 w-full items-center gap-3 rounded-2xl border border-border/60 bg-white/60 px-3 text-base text-foreground shadow-sm transition-all backdrop-blur-sm focus-within:border-primary/70 focus-within:shadow-[0_0_0_2px_rgba(99,102,241,0.25)] dark:border-white/20 dark:bg-slate-900/60',
           className,
         )}
         {...rest}

@@ -1,10 +1,25 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import { Check, Crown, Rocket, Sparkles } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const plans = [
+type Plan = {
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  highlight: string;
+  cta: string;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  features: string[];
+  popular?: boolean;
+};
+
+const plans: Plan[] = [
   {
     name: 'Starter',
     price: '$0',
@@ -77,86 +92,127 @@ const faqs = [
 export default function PricingPage() {
   return (
     <div className="space-y-16 pb-16">
-      <section className="space-y-6 rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/20 p-10">
-        <Badge variant="secondary" className="bg-white/70 text-foreground">
-          Simple, transparent pricing
-        </Badge>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+      {/* Header */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/20 p-8 sm:p-12">
+        <div className="pointer-events-none absolute -left-16 top-16 h-56 w-56 rounded-full bg-primary/20 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 bottom-0 h-56 w-56 rounded-full bg-secondary/30 blur-3xl" />
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Badge
+            variant="secondary"
+            className="bg-white/70 text-foreground dark:bg-white/10"
+          >
+            Simple, transparent pricing
+          </Badge>
+        </motion.div>
+        <motion.h1
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.06 }}
+          className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl"
+        >
           Choose the plan that keeps your rituals thriving
-        </h1>
-        <p className="max-w-2xl text-muted-foreground sm:text-lg">
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.12 }}
+          className="mt-3 max-w-2xl text-muted-foreground sm:text-lg"
+        >
           Whether you are leading yourself or an entire organisation, our
           pricing stays fair and scales with the value you unlock. Upgrade or
           downgrade at any time.
-        </p>
+        </motion.p>
       </section>
 
+      {/* Plans */}
       <section className="grid gap-6 lg:grid-cols-3">
-        {plans.map(plan => (
-          <Card
+        {plans.map((plan, i) => (
+          <motion.div
             key={plan.name}
-            className={`h-full border border-white/20 bg-white/70 shadow-lg backdrop-blur transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5 ${
-              plan.popular ? 'ring-2 ring-primary/50' : ''
-            }`}
+            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5, delay: i * 0.06 }}
           >
-            <CardHeader className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary/10 p-2 text-primary">
-                  <plan.icon className="h-5 w-5" />
+            <Card
+              className={[
+                'h-full border border-white/20 bg-white/70 shadow-lg backdrop-blur transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5',
+                plan.popular ? 'ring-2 ring-primary/50' : '',
+              ].join(' ')}
+            >
+              <CardHeader className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-full bg-primary/10 p-2 text-primary">
+                    <plan.icon className="h-5 w-5" />
+                  </div>
+                  <Badge variant={plan.popular ? 'default' : 'outline'}>
+                    {plan.popular ? 'Most loved' : plan.highlight}
+                  </Badge>
                 </div>
-                <Badge variant={plan.popular ? 'default' : 'outline'}>
-                  {plan.popular ? 'Most loved' : plan.highlight}
-                </Badge>
-              </div>
-              <CardTitle className="text-2xl font-semibold">
-                {plan.name}
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                {plan.description}
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div>
-                <span className="text-4xl font-bold text-foreground">
-                  {plan.price}
-                </span>
-                <span className="ml-2 text-sm text-muted-foreground">
-                  {plan.period}
-                </span>
-              </div>
-              <Button
-                className="w-full"
-                size="lg"
-                variant={plan.popular ? 'default' : 'secondary'}
-              >
-                {plan.popular ? 'Start team trial' : plan.cta}
-              </Button>
-              <div className="h-px w-full bg-primary/20" />
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                {plan.features.map(feature => (
-                  <li key={feature} className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 text-primary" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+                <CardTitle className="text-2xl font-semibold">
+                  {plan.name}
+                </CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  {plan.description}
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <span className="text-4xl font-bold text-foreground">
+                    {plan.price}
+                  </span>
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {plan.period}
+                  </span>
+                </div>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  variant={plan.popular ? 'default' : 'secondary'}
+                >
+                  {plan.popular ? 'Start team trial' : plan.cta}
+                </Button>
+                <div className="h-px w-full bg-primary/20" />
+                <ul className="space-y-3 text-sm text-muted-foreground">
+                  {plan.features.map(feature => (
+                    <li key={feature} className="flex items-start gap-3">
+                      <Check className="mt-0.5 h-4 w-4 text-primary" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </section>
 
+      {/* FAQs */}
       <section className="space-y-8 rounded-3xl border border-white/15 bg-background/80 p-8 shadow-xl backdrop-blur lg:p-12">
         <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
           Questions, answered
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {faqs.map(item => (
-            <div key={item.question} className="space-y-3">
+          {faqs.map((item, i) => (
+            <motion.div
+              key={item.question}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.45, delay: i * 0.05 }}
+              className="rounded-2xl border border-white/10 bg-white/60 p-5 shadow-sm backdrop-blur dark:bg-white/5"
+            >
               <h3 className="text-lg font-semibold text-foreground">
                 {item.question}
               </h3>
-              <p className="text-sm text-muted-foreground">{item.answer}</p>
-            </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {item.answer}
+              </p>
+            </motion.div>
           ))}
         </div>
       </section>

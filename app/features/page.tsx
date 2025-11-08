@@ -1,3 +1,6 @@
+'use client';
+
+import { motion } from 'framer-motion';
 import {
   Brain,
   CalendarCheck,
@@ -58,37 +61,63 @@ const performanceMetrics = [
 export default function FeaturesPage() {
   return (
     <div className="space-y-16 pb-16">
+      {/* Intro / Metrics */}
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/15 via-primary/5 to-secondary/20 p-8 sm:p-12">
         <div className="pointer-events-none absolute -left-16 top-20 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute -right-24 bottom-0 h-56 w-56 rounded-full bg-secondary/30 blur-3xl" />
+
         <div className="relative space-y-6">
-          <Badge variant="secondary" className="bg-white/70 text-foreground">
-            Focus, share, celebrate
-          </Badge>
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Badge
+              variant="secondary"
+              className="bg-white/70 text-foreground dark:bg-white/10"
+            >
+              Focus, share, celebrate
+            </Badge>
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.05 }}
+            className="text-4xl font-bold tracking-tight sm:text-5xl"
+          >
             Everything you need to run your twenty five rituals with confidence
-          </h1>
-          <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, delay: 0.1 }}
+            className="max-w-2xl text-base text-muted-foreground sm:text-lg"
+          >
             THE TWENTY FIVE combines proven focus frameworks with delightful
             collaboration tools. Keep everyone on pace, reduce friction, and
             spotlight the work that moves the needle.
-          </p>
+          </motion.p>
+
           <div className="grid gap-6 pt-4 sm:grid-cols-3">
-            {performanceMetrics.map(metric => (
-              <div
+            {performanceMetrics.map((metric, i) => (
+              <motion.div
                 key={metric.label}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.12 + i * 0.04 }}
                 className="rounded-2xl border border-white/20 bg-white/60 p-4 text-left shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
               >
                 <p className="text-3xl font-semibold text-foreground sm:text-4xl">
                   {metric.metric}
                 </p>
                 <p className="text-sm text-muted-foreground">{metric.label}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
+      {/* Core features */}
       <section className="space-y-10">
         <div className="space-y-3">
           <Badge variant="outline" className="border-primary/40 text-primary">
@@ -105,30 +134,42 @@ export default function FeaturesPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">
-          {featureHighlights.map(feature => (
-            <Card
+          {featureHighlights.map((feature, i) => (
+            <motion.div
               key={feature.title}
-              className="h-full border border-white/20 bg-white/70 text-left shadow-md backdrop-blur transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5"
+              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.5, delay: i * 0.06 }}
             >
-              <CardContent className="space-y-4 p-6">
-                <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary">
-                  <feature.icon className="h-5 w-5" />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-muted-foreground">
-                  {feature.description}
-                </p>
-              </CardContent>
-            </Card>
+              <Card className="h-full border border-white/20 bg-white/70 text-left shadow-md backdrop-blur transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5">
+                <CardContent className="space-y-4 p-6">
+                  <div className="inline-flex items-center justify-center rounded-full bg-primary/10 p-2 text-primary">
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </section>
 
+      {/* Automations / Right rail */}
       <section className="rounded-3xl border border-white/15 bg-background/80 p-8 shadow-xl backdrop-blur lg:p-12">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_1fr]">
-          <div className="space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.55 }}
+            className="space-y-6"
+          >
             <h3 className="text-2xl font-semibold text-foreground sm:text-3xl">
               Automations that keep the momentum alive
             </h3>
@@ -138,24 +179,34 @@ export default function FeaturesPage() {
               and nagging.
             </p>
             <div className="grid gap-4">
-              {automationFeatures.map(feature => (
-                <div
-                  key={feature.title}
+              {automationFeatures.map((f, i) => (
+                <motion.div
+                  key={f.title}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.45, delay: i * 0.05 }}
                   className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-5"
                 >
                   <div className="flex items-center gap-3 text-sm font-semibold text-primary">
                     <Sparkles className="h-4 w-4" />
-                    {feature.title}
+                    {f.title}
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    {feature.description}
+                    {f.description}
                   </p>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="space-y-6 rounded-2xl border border-white/10 bg-white/70 p-6 shadow-md backdrop-blur dark:bg-white/5">
+          <motion.div
+            initial={{ opacity: 0, x: 10 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.6 }}
+            className="space-y-6 rounded-2xl border border-white/10 bg-white/70 p-6 shadow-md backdrop-blur dark:bg-white/5"
+          >
             <h4 className="text-lg font-semibold text-foreground">
               Built for measurable progress
             </h4>
@@ -185,13 +236,13 @@ export default function FeaturesPage() {
                     Insights without spreadsheets
                   </p>
                   <p>
-                    Export executive-ready snapshots or drill into the details
-                    right inside the workspace.
+                    Export executive-ready snapshots or drill into details right
+                    in the workspace.
                   </p>
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>

@@ -1,14 +1,10 @@
-// components/HeroSection.tsx
+// components/marketing/hero-section.tsx
 'use client';
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Play } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-
-// components/HeroSection.tsx
-
-// components/HeroSection.tsx
 
 export default function HeroSection() {
   return (

@@ -1,4 +1,4 @@
-// components/Footer.tsx
+// components/layout/footer.tsx
 'use client';
 
 import Link from 'next/link';
@@ -9,10 +9,6 @@ import { ArrowUp, Github, Linkedin, Mail, Twitter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-
-// components/Footer.tsx
-
-// components/Footer.tsx
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();

@@ -35,8 +35,8 @@ export default function VerifyEmailPage() {
         </CardHeader>
         <CardContent className="space-y-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Great news—signing in with Google or a verified phone number now
-            gives you instant access to protected areas of the platform.
+            Great news—signing in with your Google account now gives you instant
+            access to protected areas of the platform.
           </p>
 
           <div className="space-y-3">

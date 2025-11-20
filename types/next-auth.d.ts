@@ -8,18 +8,12 @@ declare module 'next-auth' {
       accessToken?: string | undefined;
       emailVerified: boolean;
       isLikelyFake?: boolean | undefined;
-      phoneLogin?: boolean | undefined;
-      phoneMasked?: string | undefined;
-      phoneLast4?: string | undefined;
     } & DefaultSession['user'];
   }
 
   interface User {
     emailVerified?: boolean | Date | null;
     isLikelyFake?: boolean;
-    phoneLogin?: boolean;
-    phoneMasked?: string;
-    phoneLast4?: string;
   }
 
   interface Profile {
@@ -40,9 +34,6 @@ declare module 'next-auth/jwt' {
     accessToken?: string | undefined;
     emailVerified: boolean;
     isLikelyFake?: boolean | undefined;
-    phoneLogin?: boolean | undefined;
-    phoneMasked?: string | undefined;
-    phoneLast4?: string | undefined;
     sub?: string;
   }
 }

@@ -1,13 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Mail, Phone, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 
 import { GoogleSignIn } from '@/components/auth/google-sign-in';
-import { PhoneOtpForm } from '@/components/auth/phone-otp-form';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -24,21 +21,8 @@ export function SignInDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const reset = () => setSelected(null);
-  const handleSuccess = () => {
-    onOpenChange(false);
-    reset();
-  };
-
   return (
-    <Dialog
-      open={open}
-      onOpenChange={o => {
-        onOpenChange(o);
-        if (!o) reset();
-      }}
-    >
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button
           size="sm"
@@ -64,7 +48,7 @@ export function SignInDialog({
           <VisuallyHidden>Sign in</VisuallyHidden>
         </DialogTitle>
         <DialogDescription asChild>
-          <VisuallyHidden>Choose Google or Phone Number sign in</VisuallyHidden>
+          <VisuallyHidden>Continue with Google</VisuallyHidden>
         </DialogDescription>
 
         <div className="relative overflow-hidden">
@@ -81,100 +65,7 @@ export function SignInDialog({
               Welcome back
             </motion.div>
 
-            <AnimatePresence mode="wait">
-              {!selected ? (
-                <motion.div
-                  key="choose"
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 40,
-                    duration: 0.1,
-                  }}
-                  className="space-y-6"
-                >
-                  <motion.div
-                    initial={{ y: -3, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.05, duration: 0.2 }}
-                    className="text-center"
-                  >
-                    <h2 className="text-xl font-bold tracking-tight text-foreground">
-                      Choose your sign-in method
-                    </h2>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Pick the option that fits you best. You can switch between
-                      providers anytime.
-                    </p>
-                  </motion.div>
-
-                  <div className="grid gap-4">
-                    <motion.div
-                      initial={{ y: 8, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.08, duration: 0.18 }}
-                    >
-                      <Button
-                        variant="outline"
-                        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-border/60 bg-gradient-to-r from-white via-slate-50 to-white text-base font-semibold text-slate-900 shadow-[0_18px_30px_-24px_rgba(15,23,42,0.6)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_25px_45px_-25px_rgba(79,70,229,0.55)] dark:from-neutral-100 dark:via-white dark:to-neutral-100 dark:text-slate-900"
-                        onClick={() => setSelected('google')}
-                      >
-                        <Mail className="h-5 w-5 text-[#4285F4]" />
-                        <span>Continue with Google</span>
-                      </Button>
-                    </motion.div>
-
-                    <motion.div
-                      initial={{ y: 8, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 0.13, duration: 0.18 }}
-                    >
-                      <Button
-                        variant="outline"
-                        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-transparent bg-gradient-to-r from-sky-500 via-indigo-500 to-violet-600 text-base font-semibold text-white shadow-[0_20px_45px_-25px_rgba(56,189,248,0.9)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_30px_55px_-25px_rgba(129,140,248,0.85)]"
-                        onClick={() => setSelected('phone')}
-                      >
-                        <Phone className="h-5 w-5" />
-                        <span>Sign in with Phone</span>
-                      </Button>
-                    </motion.div>
-                  </div>
-                </motion.div>
-              ) : selected === 'phone' ? (
-                <motion.div
-                  key="phone"
-                  initial={{ opacity: 0, x: 15 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -15 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 40,
-                    duration: 0.1,
-                  }}
-                >
-                  <PhoneOtpForm onBack={reset} onSuccess={handleSuccess} />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="google"
-                  initial={{ opacity: 0, x: 15 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -15 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 40,
-                    duration: 0.1,
-                  }}
-                >
-                  <GoogleSignIn onBack={reset} />
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <GoogleSignIn />
           </div>
         </div>
       </DialogContent>

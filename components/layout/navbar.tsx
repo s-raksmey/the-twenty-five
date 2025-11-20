@@ -124,7 +124,7 @@ export default function Navbar() {
                       {session.user?.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {session.user?.email ?? session.user?.phoneMasked ?? ''}
+                      {session.user?.email ?? ''}
                     </p>
                   </div>
                 </DropdownMenuLabel>

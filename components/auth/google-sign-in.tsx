@@ -7,7 +7,7 @@ import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 
 interface GoogleSignInProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
 export function GoogleSignIn({ onBack }: GoogleSignInProps) {
@@ -59,14 +59,16 @@ export function GoogleSignIn({ onBack }: GoogleSignInProps) {
         </div>
       </div>
 
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="group inline-flex w-auto items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-        Back
-      </Button>
+      {onBack && (
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="group inline-flex w-auto items-center gap-2 rounded-md text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+          Back
+        </Button>
+      )}
     </motion.div>
   );
 }

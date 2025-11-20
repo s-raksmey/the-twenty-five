@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-
 import { useSearchParams } from 'next/navigation';
 
 import {
@@ -10,12 +8,10 @@ import {
   Clock,
   Lock,
   ShieldCheck,
-  Smartphone,
   Users,
 } from 'lucide-react';
 import { signIn } from 'next-auth/react';
 
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,11 +21,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 
 import { cn } from '@/lib/utils';
-
-const RESEND_COOLDOWN_SECONDS = 60;
 
 const highlightFeatures = [
   {
@@ -40,9 +33,8 @@ const highlightFeatures = [
   },
   {
     title: 'Frictionless access',
-    description:
-      'Sign in with Google or a verified phone number in less than twenty seconds.',
-    icon: Smartphone,
+    description: 'Sign in with Google in less than twenty seconds.',
+    icon: CheckCircle2,
   },
   {
     title: 'Realtime collaboration',
@@ -65,111 +57,13 @@ const trustMetrics = [
 ];
 
 export default function SignInPage() {
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  const [cooldown, setCooldown] = useState(0);
-  const [isRequestingCode, setIsRequestingCode] = useState(false);
-  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
-  const [otpRequested, setOtpRequested] = useState(false);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [statusVariant, setStatusVariant] = useState<
-    'success' | 'error' | 'info' | null
-  >(null);
-  const [maskedPhone, setMaskedPhone] = useState('');
-  const [debugCode, setDebugCode] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const isCompact = searchParams.get('mode') === 'compact';
   const callbackUrl = searchParams.get('callbackUrl') ?? '/';
 
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const timer = window.setInterval(() => {
-      setCooldown(value => (value > 0 ? value - 1 : 0));
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [cooldown]);
-
-  const resetStatus = () => {
-    setStatusMessage(null);
-    setStatusVariant(null);
-  };
-
   const handleGoogleSignIn = () => {
     signIn('google', { callbackUrl });
   };
-
-  const handleRequestCode = async () => {
-    resetStatus();
-    setIsRequestingCode(true);
-
-    try {
-      const response = await fetch('/api/auth/phone/request-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        const errorMessage =
-          data?.message ||
-          data?.errors?.phone?.[0] ||
-          'We could not send a verification code. Please try again.';
-
-        setStatusVariant('error');
-        setStatusMessage(errorMessage);
-        return;
-      }
-
-      const maskedTarget = data.maskedPhone ?? 'your phone';
-      setOtpRequested(true);
-      setCooldown(RESEND_COOLDOWN_SECONDS);
-      setMaskedPhone(maskedTarget);
-      setDebugCode(data.debugCode ?? null);
-      setStatusVariant('success');
-      setStatusMessage(`Verification code sent to ${maskedTarget}.`);
-    } catch (error) {
-      console.error('Failed to request OTP', error);
-      setStatusVariant('error');
-      setStatusMessage('Something went wrong. Please try again.');
-    } finally {
-      setIsRequestingCode(false);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    resetStatus();
-    setIsVerifyingCode(true);
-
-    try {
-      const result = await signIn('phone', {
-        phone,
-        code,
-        redirect: false,
-        callbackUrl,
-      });
-
-      if (result?.error) {
-        setStatusVariant('error');
-        setStatusMessage(result.error);
-        return;
-      }
-
-      const destination = result?.url ?? callbackUrl;
-      window.location.href = destination;
-    } catch (error) {
-      console.error('Failed to verify OTP', error);
-      setStatusVariant('error');
-      setStatusMessage('Unable to verify the code. Please try again.');
-    } finally {
-      setIsVerifyingCode(false);
-    }
-  };
-
-  const showDebugCode =
-    debugCode && process.env.NODE_ENV !== 'production' && otpRequested;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-background via-background/95 to-muted/70">
@@ -257,12 +151,11 @@ export default function SignInPage() {
                 Secure workspace entry
               </Badge>
               <CardTitle className="text-2xl font-semibold">
-                Choose how you want to sign in
+                Sign in with Google
               </CardTitle>
               <CardDescription>
-                Verified Google accounts and trusted phone numbers keep your
-                rituals safe. We never store full phone numbers—only a protected
-                hash.
+                Verified Google accounts keep your rituals safe. No phone
+                numbers or extra codes required.
               </CardDescription>
             </CardHeader>
 
@@ -270,105 +163,23 @@ export default function SignInPage() {
               <div className="space-y-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 p-5 text-sm text-muted-foreground">
                 <div className="flex items-center gap-3 text-primary">
                   <Lock className="h-4 w-4" />
-                  <span className="font-medium">
-                    Multi-factor protection enabled
-                  </span>
+                  <span className="font-medium">Google-powered protection</span>
                 </div>
                 <p>
-                  For phone sign in we send a one-time passcode to your device.
-                  Codes expire after two minutes and can be requested again once
-                  the timer resets.
+                  We rely on Google OAuth for secure access—no passwords to
+                  remember and nothing sensitive stored with us.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  We only request your name and email address to personalise
+                  your workspace and keep you notified about important updates.
                 </p>
               </div>
 
               <div className="space-y-5">
-                <div className="space-y-2">
-                  <label
-                    className="text-sm font-medium text-foreground"
-                    htmlFor="phone-input"
-                  >
-                    Phone number
-                  </label>
-                  <Input
-                    id="phone-input"
-                    placeholder="e.g. +15551234567"
-                    value={phone}
-                    onChange={event => setPhone(event.target.value)}
-                    inputMode="tel"
-                    autoComplete="tel"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Include your country code. We only retain the final four
-                    digits so that we can recognise your device next time.
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <Button
-                    onClick={handleRequestCode}
-                    disabled={
-                      isRequestingCode ||
-                      cooldown > 0 ||
-                      phone.trim().length === 0
-                    }
-                    className="flex-1"
-                    variant="secondary"
-                  >
-                    {cooldown > 0
-                      ? `Resend code in ${cooldown}s`
-                      : 'Send verification code'}
-                  </Button>
-                  <span className="text-xs text-muted-foreground">
-                    SMS rates may apply.
-                  </span>
-                </div>
-
-                {otpRequested && (
-                  <div className="space-y-3 rounded-xl border border-white/20 bg-white/60 p-4 text-left backdrop-blur dark:border-white/10 dark:bg-white/5">
-                    <div className="space-y-2">
-                      <label
-                        className="text-sm font-medium text-foreground"
-                        htmlFor="otp-input"
-                      >
-                        One-time passcode
-                      </label>
-                      <Input
-                        id="otp-input"
-                        placeholder="6-digit code"
-                        value={code}
-                        onChange={event => setCode(event.target.value)}
-                        inputMode="numeric"
-                        autoComplete="one-time-code"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Enter the code we sent to {maskedPhone}. Codes expire
-                        quickly for your security.
-                      </p>
-                    </div>
-
-                    <Button
-                      onClick={handleVerifyCode}
-                      disabled={isVerifyingCode || code.trim().length < 6}
-                      className="w-full"
-                    >
-                      {isVerifyingCode ? 'Verifying…' : 'Verify and continue'}
-                    </Button>
-
-                    {showDebugCode && (
-                      <p className="text-xs text-muted-foreground">
-                        Development code for {maskedPhone}:{' '}
-                        <strong>{debugCode}</strong>
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary" />
                   <p className="text-sm font-medium text-foreground">
-                    Prefer to skip the code? Use Google instead.
+                    Quick sign in—no codes or delays.
                   </p>
                 </div>
                 <Button
@@ -398,23 +209,6 @@ export default function SignInPage() {
                   <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
-
-              {statusMessage && statusVariant && (
-                <Alert
-                  variant={
-                    statusVariant === 'error' ? 'destructive' : 'default'
-                  }
-                  className={
-                    statusVariant === 'success'
-                      ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      : undefined
-                  }
-                >
-                  <AlertDescription className="text-sm">
-                    {statusMessage}
-                  </AlertDescription>
-                </Alert>
-              )}
             </CardContent>
           </Card>
         </section>

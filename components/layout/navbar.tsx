@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { type Variants, motion } from 'framer-motion';
 import { signOut, useSession } from 'next-auth/react';
 
-import { SignInDialog } from '@/components/auth/sign-in-dialog';
+import { SignInPopover } from '@/components/auth/sign-in-popover';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +34,6 @@ const navItem: Variants = {
 export default function Navbar() {
   const { data: session, status } = useSession();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isSignInDialogOpen, setIsSignInDialogOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -142,10 +141,7 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <SignInDialog
-              open={isSignInDialogOpen}
-              onOpenChange={setIsSignInDialogOpen}
-            />
+            <SignInPopover />
           )}
         </div>
       </div>
